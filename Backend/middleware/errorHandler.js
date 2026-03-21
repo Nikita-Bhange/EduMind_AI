@@ -1,0 +1,53 @@
+const errorhandler =(err,req,res,next)=>{
+    let statusCode = err.statusCode || 500;
+    let message = err.message || 'Server error';
+
+
+//mongoose bad objectId
+if(err.name === 'CastError'){
+    message = 'Resource not found';
+    statusCode =404;
+}
+
+//mongoose duplicate key
+if(err.code === 11000){
+    const field = Object.keys(err.keyValue[0]);
+    message =`${field} already exists`;
+    statusCode =400
+}
+
+//mongoose validation error
+if(err.name === 'ValidationError'){
+    message = Object.values(err.errors).map(val =>valmessage).join(', ');
+    statusCode =400;
+}
+
+//multer file size error
+if(err.code === 'LIMIT_FILE_SIZE'){
+    message = 'File size exceeds the maximum limit of 10 MB';
+    statusCode = 400;
+}
+
+//JWT error 
+if(err.name === 'JsonWebTokenError'){
+    message ='Invalid token';
+    statusCode =401
+}
+
+if(err.name === 'TokenExpiredError'){
+    message ='Invalid expired';
+    statusCode =401
+}
+
+console.error('Error:',{
+    message:err.message,
+    stack :process.env.NODE_ENV ==='development' ? err.stack :undefined
+})
+
+res.status(statusCode).json({
+    success:false,
+    error:message,
+    statusCode,
+    ...errorhandler(process.env.NODE_ENV === 'development' && {stack:err.stack})
+})
+}
