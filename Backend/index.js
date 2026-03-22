@@ -2,6 +2,9 @@ import express, { urlencoded } from "express";
 import connectDB from "./config/db.js"
 import errorHandler from "./middleware/errorHandler.js"
 import authRoutes from './routes/authRoutes.js'
+import documentRoutes from './routes/documentRoutes.js'
+import flashcardRoutes from './routes/flashcardRoutes.js'
+import quizRoutes from './routes/quizRoutes.js'
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from "url";
@@ -37,7 +40,9 @@ const app = express();
 
  //Routes
  app.use('/api/auth',authRoutes)
-
+ app.use('/api/documents',documentRoutes)
+app.use('/api/flashcard',flashcardRoutes)
+app.use('/api/quiz',quizRoutes)
 app.use(errorHandler);
 
  //404 handler
