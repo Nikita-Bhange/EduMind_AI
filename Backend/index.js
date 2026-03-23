@@ -5,6 +5,8 @@ import authRoutes from './routes/authRoutes.js'
 import documentRoutes from './routes/documentRoutes.js'
 import flashcardRoutes from './routes/flashcardRoutes.js'
 import quizRoutes from './routes/quizRoutes.js'
+import aiRoutes from './routes/aiRoutes.js'
+import progressRoutes from './routes/progressRoutes.js'
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from "url";
@@ -42,7 +44,9 @@ const app = express();
  app.use('/api/auth',authRoutes)
  app.use('/api/documents',documentRoutes)
 app.use('/api/flashcard',flashcardRoutes)
-app.use('/api/quiz',quizRoutes)
+app.use('/api/quizzes',quizRoutes)
+app.use('/api/ai',aiRoutes)
+app.use('/api/progress',progressRoutes)
 app.use(errorHandler);
 
  //404 handler
