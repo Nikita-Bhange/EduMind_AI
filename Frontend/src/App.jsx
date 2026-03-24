@@ -13,8 +13,7 @@ import QuizResultPage from "./pages/Quizzes/QuizResultPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 const App = () => {
-  const isAuthenticated = true
-  const loading=  false
+  const { isAuthenticated, loading } = useAuth();
   if(loading){
    return(
     <div className="flex it"><p>Loading..</p></div>

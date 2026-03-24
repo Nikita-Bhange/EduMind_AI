@@ -1,34 +1,68 @@
-export const uploadDocument = async (req, res, next) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: 'Please upload a PDF file',
-        statusCode: 400
-      });
-    }
+import axiosInstance from "../utils/axiosInstance";
+import { API_PATHS  } from "../utils/apiPaths";
 
-    const { title } = req.body;
+const login=  async(email ,password)=>{
+  try{
+    const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN,{
+      email,
+      password,
+    })
 
-    if (!title) {
-      // Delete uploaded file if no title provided
-      await fs.unlink(req.file.path);
-      return res.status(400).json({
-        success: false,
-        error: 'Please provide a document title',
-        statusCode: 400
-      });
-    }
-
-    // Construct the URL for the uploaded file
-    const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
-    const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
-
-  } catch (error) {
-    // Clean up file on error
-    if (req.file) {
-      await fs.unlink(req.file.path).catch(() => {});
-    }
-    next(error);
+    return response.data;
+  }catch(error){
+    throw error.response?.data || {message: 'An unknown error occurred'}
   }
+}
+
+const register=  async(username,email ,password)=>{
+  try{
+    const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER,{
+      username,
+      email,
+      password,
+    })
+
+    return response.data;
+  }catch(error){
+    throw error.response?.data || {message: 'An unknown error occurred'}
+  }
+}
+
+const getProfile=  async()=>{
+  try{
+    const response = await axiosInstance.get(API_PATHS.AUTH.GET_PROFILE);
+    return response.data;
+  }catch(error){
+    throw error.response?.data || {message: 'An unknown error occurred'}
+  }
+}
+
+
+
+const updateProfile=  async(userData)=>{
+  try{
+    const response = await axiosInstance.put(API_PATHS.AUTH.UPDATE_PROFILE,userData);
+    return response.data;
+  }catch(error){
+    throw error.response?.data || {message: 'An unknown error occurred'}
+  }
+}
+
+ const changePassword=  async(password)=>{
+  try{
+    const response = await axiosInstance.post(API_PATHS.AUTH.CHANGE_PASSWORD,password);
+    return response.data;
+  }catch(error){
+    throw error.response?.data || {message: 'An unknown error occurred'}
+  }
+}
+
+const authService ={
+  login,
+  register,
+  getProfile,
+  updateProfile,
+  changePassword,
 };
+
+export default authService;
