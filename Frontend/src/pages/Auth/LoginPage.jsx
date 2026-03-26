@@ -6,8 +6,8 @@ import toast from 'react-hot-toast';
 import { BrainCircuit, Mail, Lock, ArrowRight } from 'lucide-react'
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('something@gmail.com');
-  const [password, setPassword] = useState('test@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
@@ -101,7 +101,7 @@ const LoginPage = () => {
                 )}
 
                 {/* submitbtn */}
-                <button onClick={handleSubmit} disabled={loading} className='group relative w-full h-12 
+                <button onClick={handleSubmit} disabled={loading} className='mt-2 group relative w-full h-12 
             bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98]
           text-white text-sm font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/20
            disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 shadow-lg shadow-emerald-500/25 overflow-hidden '>
@@ -125,10 +125,10 @@ const LoginPage = () => {
               </form>
             </div>
 
-            footer
+           
             <div className='mt-8 pt-6 border-t border-slate-200/60'>
               <p className='text-center text-sm text-slate-600'>
-                Don't have an account?('')
+                Don't have an account?
 
                 <Link to='/register' className='font-semibold text-emerald-600 hover:text-emerald-700 transition-colors duration-200'>
                   Sign Up</Link>

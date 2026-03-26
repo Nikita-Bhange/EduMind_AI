@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/Auth/LoginPage";
-import { RegisterPage } from "./pages/Auth/RegisterPage";
+import RegisterPage from "./pages/Auth/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage"
 import DocumentListPage from "./pages/Documents/DocumentListPage";
@@ -12,11 +12,14 @@ import QuizTakePage from "./pages/Quizzes/QuizTakePage";
 import QuizResultPage from "./pages/Quizzes/QuizResultPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-const App = () => {
+import { AuthProvider, useAuth } from "./context/AuthContext";
+const AppContent = () => {
   const { isAuthenticated, loading } = useAuth();
   if(loading){
    return(
-    <div className="flex it"><p>Loading..</p></div>
+    <div className="flex items-center justify-center min-h-screen">
+      <p className="text-lg">Loading...</p>
+    </div>
    )
   }
   return (
@@ -52,6 +55,14 @@ const App = () => {
       </Routes>
     </Router>
    
+  );
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

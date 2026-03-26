@@ -27,15 +27,15 @@ const app = express();
  //Middleware to handle CORS
  app.use(
     cors({
-        origin:"*",
-        methods:["GET","PUT","POST","DELETE"],
-        allowedHeaders:["Connect-Type","Authorization"],
-        credentials:true,
+        origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:5173",
+        methods: ["GET", "PUT", "POST", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
     })
  )
 
  app.use(express.json())
- app.use(express,urlencoded({extended:true}));
+ app.use(express.urlencoded({extended:true}));
 
  //Static folder for uploads
  app.use('/uploads',express.static(path.join(__dirname,'uploads')));

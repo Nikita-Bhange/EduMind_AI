@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-    geQuizzes,
+    getQuizzes,
     getQuizById,
     submitQuiz,
     getQuizResults,
@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.use(protect);
 
-router.get('/:documentId',getquizzes);
+router.get('/:documentId',getQuizzes);
 router.get('/quiz/:id',getQuizById);
 router.post('/:id/submit',submitQuiz);
 router.get('/:id/results',getQuizResults);

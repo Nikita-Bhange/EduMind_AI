@@ -14,7 +14,7 @@ const registerValidation = [
 
 const loginValidation = [
       body('email').isEmail().normalizeEmail().withMessage('please provide a valid email'),
-    body('password').isEmpty().withMessage('password is required')
+    body('password').notEmpty().withMessage('password is required')
 ]
 
 //public routes
@@ -24,7 +24,7 @@ router.post('/login',loginValidation,login)
 
 //protected routes
 router.get('/profile',protect,getProfile);
-router.put('profile',protect,updateProfile);
+router.put('/profile',protect,updateProfile);
 router.post('/change-password',protect,changePassword)
 
 export default router

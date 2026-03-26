@@ -1,4 +1,4 @@
-import Document from "../models/Document";
+import Document from "../models/Document.js";
 import { generateFlashcards } from "../utils/geminiService.js";
 import Quiz from "../models/Quiz.js";
 import Flashcard from "../models/Flashcard.js";

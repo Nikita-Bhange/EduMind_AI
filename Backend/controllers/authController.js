@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js"
+import {validationResult} from "express-validator";
 
 //Generate JWT token
 const generateToken =(id)=>{
@@ -13,17 +14,25 @@ const generateToken =(id)=>{
 //@access public
 export const register = async (req , res , next)=>{
     try{
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({
+                success:false,
+                error: errors.array()[0].msg,
+                statusCode:400,
+            });
+        }
+
         const {username,email,password} = req.body;
 
         //check if user exists
-        const userExsists = await User.findOne({$or:[{email}]})
+        const userExsists = await User.findOne({$or:[{email:email},{username:username}]})
 
         if(userExsists){
             return res.status(400).json({
                 success:false,
-                error: 
-                    userExsists.email= email ?"email already registered":"username already taken",
-                    statusCode:400,
+                error: userExsists.email === email ? "email already registered" : "username already taken",
+                statusCode:400,
             })
         }
         //create user

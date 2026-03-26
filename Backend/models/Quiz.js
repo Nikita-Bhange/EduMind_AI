@@ -81,6 +81,6 @@ const quizSchema = new mongoose.Schema({
 //Index for faster queries
 quizSchema.index({userId:1, documentId:1});
 
-const Quiz = mongoose.model('Quiz', quizSchema);
+const Quiz = mongoose.models.Quiz || mongoose.model('Quiz', quizSchema);
 
 export default Quiz;

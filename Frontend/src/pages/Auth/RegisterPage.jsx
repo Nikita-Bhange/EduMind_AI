@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext';
 import authService from '../../services/authService';
 import toast from 'react-hot-toast';
-import { BrainCircuit, Mail, Lock, ArrowRight } from 'lucide-react'
+import { BrainCircuit, Mail, Lock, ArrowRight, User } from 'lucide-react'
 
 
  const RegisterPage = () => {
@@ -104,7 +104,7 @@ import { BrainCircuit, Mail, Lock, ArrowRight } from 'lucide-react'
                     password
                   </label>
                   <div className='relative group'>
-                    <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none ${focusedField === 'password' ? 'text-emerald-500' : 'text-slate-400'}`}>
+                    <div className={` mb-1 absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none ${focusedField === 'password' ? 'text-emerald-500' : 'text-slate-400'}`}>
                       <Lock className='w-4 h-4' strokeWidth={2} />
                     </div>
                     <input
@@ -127,12 +127,12 @@ import { BrainCircuit, Mail, Lock, ArrowRight } from 'lucide-react'
                 )}
 
                 {/* submitbtn */}
-                <button onClick={handleSubmit} disabled={loading} className='group relative w-full h-12 
+                <button onClick={handleSubmit} disabled={loading} className='mt-2 group relative w-full h-12 
             bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98]
           text-white text-sm font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/20
            disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 shadow-lg shadow-emerald-500/25 overflow-hidden '>
 
-                  <span className='relative z-10 flex justify-center items-center gap-2'>
+                  <span className='relative z-10 flex justify-center items-center gap-4'>
                     {loading ? (
                       <>
                         <div className='w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin'></div>Creating Account...
@@ -151,10 +151,10 @@ import { BrainCircuit, Mail, Lock, ArrowRight } from 'lucide-react'
               </form>
             </div>
 
-            footer
+            
             <div className='mt-8 pt-6 border-t border-slate-200/60'>
               <p className='text-center text-sm text-slate-600'>
-                Already have an account?('')
+                Already have an account?
 
                 <Link to='/login' className='font-semibold text-emerald-600 hover:text-emerald-700 transition-colors duration-200'>
                   Sign In</Link>
