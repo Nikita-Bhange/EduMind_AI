@@ -67,3 +67,10 @@ const App = () => {
 };
 
 export default App;
+
+
+
+
+
+// AuthProvider context - manages state -> user, isAuthenticated, loading
+// AppContent is wrapped inside - all routes and components inside are children of AuthProvider

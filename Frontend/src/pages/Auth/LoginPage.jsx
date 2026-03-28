@@ -11,8 +11,12 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  // The focusedField state is used to track which input 
+  // field is currently focused and
+  //  provide visual feedback by changing the icon color.
 
-  const { login } = useAuth();
+   const { login } = useAuth(); 
+  //# login function from AuthContext to update auth state on successful login
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

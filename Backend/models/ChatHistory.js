@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+// structure of your collection-schema,userId- field
 const chatHistorySchema = new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
@@ -21,7 +21,7 @@ const chatHistorySchema = new mongoose.Schema({
         },
       
         content:{
-            type:Number,
+            type:String,
             required:true
         },
         timestamp:{

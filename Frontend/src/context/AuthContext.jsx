@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
-
+// useAuth is custom hook (used within authprovider)
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
