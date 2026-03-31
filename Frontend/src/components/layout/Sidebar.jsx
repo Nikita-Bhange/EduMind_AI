@@ -86,10 +86,12 @@ const Sidebar = ({isSidebarOpen, toggleSidebar}) => {
       </nav>
 
       {/* Logout Button */}
-      <div className=''>
-        <button onClick={handleLogout} className='flex items-center gap-3 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 mt-auto w-full'>
+      <div className='px-3 py-4 border-t border-slate-200/60'>
+        <button onClick={handleLogout} className='group flex items-center gap-3 w-full px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 mt-auto '>
       
-        <logout
+        <LogOut size={18} strokeWidth={2.5} className='transition-transform duration-200 group-hover:scale-110' />
+        Logout
+      </button>
       </div>
 
     </>
