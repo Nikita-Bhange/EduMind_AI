@@ -97,53 +97,13 @@ const processPDF = async(documentId,filePath)=>{
 
 export const getDocuments = async (req, res, next)=>{
     try{
-        const documents = await Document.aggregate([
-            {
-                $match: { userId: mongoose.Types.ObjectId(req.user._id) }
-            },
-            {
-                $lookup: {
-                    from: 'flashcards',
-                    localField: '_id',
-                    foreignField: 'documentId',
-                    as: 'flashcards'
-                }
-
-            },
-            {
-                $lookup: {
-                    from: 'quizzes',
-                    localField: '_id',
-                    foreignField: 'documentId',
-                    as: 'quizzes'
-                }
-            },
-                {
-                    $addFields:{
-                        flashcardCount: { $size: '$flashcards' },
-                        quizCount: { $size: '$quizzes' }
-                    }
-                },
-                {
-                    $project:{
-                        extractedText:0,
-                        chunks:0,
-                        flashcardSets:0,
-                        quizzes:0,
-                    }
-                },
-                {
-                    $sort:{uploadDate:-1}
-                }
-        ]);
+        const documents = await Document.find({ userId: req.user._id }).sort({ createdAt: -1 }).select('-extractedText -chunks');
         res.status(200).json({
             success: true,
             data: documents
         });
 
     }catch(error){
-        //clean up file on error
-       
         next (error);
     }
 }

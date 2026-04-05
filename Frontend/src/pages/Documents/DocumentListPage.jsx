@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, FileText } from 'lucide-react'
+import { Plus, FileText, X, Trash2, Upload } from 'lucide-react'
 import toast from 'react-hot-toast'
 import DocumentCard from '../../components/documents/DocumentCard'
 import documentService from '../../services/documentService'
@@ -11,6 +11,7 @@ const DocumentListPage = () => {
   const [loading, setLoading] = useState(true)
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [selectedDoc, setSelectedDoc] = useState(null)
     
   const [uploadFile, setUploadFile] = useState(null)
   const [uploadTitle, setUploadTitle] = useState('')
@@ -62,24 +63,22 @@ const DocumentListPage = () => {
       setUploadTitle('')
       setLoading(true)
       fetchDocuments()
-    } catch (error) {
-      toast.error('Upload failed. Please try again.')
+    } catch (error) {      console.error('Upload error:', error);      toast.error('Upload failed. Please try again.')
     } finally {
       setUploading(false)
     }
   }
 
-  const handleDeleteRequest = async (doc) => {
-    setDeleting(true)
-    try {
-      await documentService.deleteDocument(doc._id)
-      setDocuments((prev) => prev.filter((item) => item._id !== doc._id))
-      toast.success(`${doc.title} deleted.`)
-    } catch (error) {
-      toast.error(error.message || 'Failed to delete document.')
-    } finally {
-      setDeleting(false)
-    }
+  const openDeleteModal = (doc) => {
+    setSelectedDoc(doc);
+    setIsDeleteModalOpen(true);
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!selectedDoc) return;
+    await handleDeleteRequest(selectedDoc);
+    setIsDeleteModalOpen(false);
+    setSelectedDoc(null);
   }
 
   const renderContent = () => {
@@ -112,7 +111,7 @@ const DocumentListPage = () => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {documents.map((doc) => (
-          <DocumentCard key={doc._id} document={doc} onDelete={handleDeleteRequest} />
+          <DocumentCard key={doc._id} document={doc} onDelete={openDeleteModal} />
         ))}
       </div>
     )
@@ -137,8 +136,8 @@ const DocumentListPage = () => {
         {renderContent()}
       </div>
       {isUploadModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm ">
-          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-2xl shadow-slate-500">
+        <div className="fixed  inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm ">
+          <div className="p-8 relative w-full max-w-lg bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-2xl shadow-slate-500">
             <button onClick={() => setIsUploadModalOpen(false)} className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200">
               <X className='w-5 h-5' strokeWidth={2} />
             </button>
@@ -155,8 +154,8 @@ const DocumentListPage = () => {
 
               <div className='space-y-2'>
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking">PDF File</label>
-                <div className="relative bprder-2 border-dashed bg-slate-50/50 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all">
-                  <input type="file" id="file-upload" className="absolte inset-0 w-full h-full opacity-0 cursor-pointer z-10 " onChange={handleFileChange} accept=".pdf" />
+                <div className="relative border-2 border-dashed bg-slate-50/50 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all">
+                  <input type="file" id="file-upload" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 " onChange={handleFileChange} accept=".pdf" />
                   <div className="flex flex-col items-center justify-center py-10 px-6">
                     <div className="w-14 h-14 rounded-xl bg-linear-to-r from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
                       <Upload className="w-7 h-7 text-emerald-600" strokeWidth={2} />
@@ -199,7 +198,7 @@ const DocumentListPage = () => {
       )}
 
 
-      {setIsDeleteModalOpen && (
+      {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm ">
           <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-2xl shadow-slate-500">
             <button onClick={() => setIsDeleteModalOpen(false)} className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200">

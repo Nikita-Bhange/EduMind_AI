@@ -3,20 +3,21 @@ import { generateFlashcards } from "../utils/geminiService.js";
 import Quiz from "../models/Quiz.js";
 import Flashcard from "../models/Flashcard.js";
 
-export const getDashboard = async(req, resizeBy,next)=>{
+export const getDashboard = async(req, res, next)=>{
     try{
          const  userId = req.user._id
 
          //get counts
          const totalDocuments = await Document.countDocuments({userId});
           const totalFlashcardSets = await Flashcard.countDocuments({userId});
-           const totalQuizzs = await Quiz.countDocuments({userId});
+           const totalQuizzes = await Quiz.countDocuments({userId});
             const completedQuizzes = await Quiz.countDocuments({userId,completed:{$ne: null}});
 
             //Get flashcard statistics
             const flashcardSets = await Flashcard.find({userId});
             let totalFlashcards = 0;
             let reviewedFlashcards =0;
+            let starredFlashcards = 0;
 
             flashcardSets.forEach(set=>{
                 totalFlashcards += set.cards.filter(c=>c.reviewCount >0).length
@@ -71,6 +72,6 @@ const studyStreak = Math.floor(Math.random() * 7) + 1; // Mock
      });
 
     }catch(error){
-
+        next(error);
     }
 }

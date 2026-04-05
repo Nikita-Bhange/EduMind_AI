@@ -13,7 +13,7 @@ const Tabs = ({tabs,activeTab, setActiveTab}) => {
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-700 hover:bg-gray-200'
               }`}
-              onClick={() => setActiveTab(tab.name)}
+              onClick={() => setActiveTab && setActiveTab(tab.name)}
             >
                 <span className="relative z-10">
               {tab.label}

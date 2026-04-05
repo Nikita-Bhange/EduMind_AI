@@ -3,10 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import documentService from '../../services/documentService';
 import Spinner from '../../components/common/Spinner';
 import toast from 'react-hot-toast';
-import ChatInterface from '../../components/documents/ChatInterface';
+import ChatInterface from '../../components/chat/ChatInterface';
+import FlashcardManager from '../../components/flashcards/FlashcardManager';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import Tabs from '../../components/common/Tabs';
+import AIActions from '../../components/ai/AIActions';
+import QuizManager from '../../components/quizzes/QuizManager';
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -93,23 +96,23 @@ const DocumentDetailPage = () => {
                 return <ChatInterface/>;
               } 
               const renderAIActions = () => {
-                return "renderAIActions";
+                return <AIActions/>;
               };
 
               const renderFlashcardsTab = () => {
-                return "renderFlashcardsTab";
+                return <FlashcardManager documentId={id}/>;
               };
               const renderQuizzesTab = () => {
-                return "renderQuizzesTab";
+                return <QuizManager/>
               };
 
 
             const tabs = [
-              { name: 'Content', label: 'Content', content: renderContent() },
-              { name: 'Chat', label: 'Chat', content: renderChat() },
-              { name: 'AI Actions', label: 'AI Actions', content: renderAIActions() },
-              { name: 'Flashcards', label: 'Flashcards', content: renderFlashcardsTab() },
-              { name: 'Quizzes', label: 'Quizzes', content: renderQuizzesTab() },
+              { name: 'Content', label: 'Content' },
+              { name: 'Chat', label: 'Chat' },
+              { name: 'AI Actions', label: 'AI Actions' },
+              { name: 'Flashcards', label: 'Flashcards' },
+              { name: 'Quizzes', label: 'Quizzes' },
             ];
 
         if (loading) {
@@ -128,8 +131,16 @@ const DocumentDetailPage = () => {
                 <ArrowLeft size={16} />
                 Back to Documents
               </Link>
-              <PageHeader title={document.data.title} subtitle={`Uploaded on ${new Date(document.data.uploadedAt).toLocaleDateString()}`} />
-              <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+              {/* subtitle={`Uploaded on ${new Date(document.data.uploadedAt).toLocaleDateString()}`} */}
+              <PageHeader className="text-2xl gap-3" title={document.data.title}  />
+              <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+            </div>
+            <div className="mt-6">
+              {activeTab === 'Content' && renderContent()}
+              {activeTab === 'Chat' && renderChat()}
+              {activeTab === 'AI Actions' && renderAIActions()}
+              {activeTab === 'Flashcards' && renderFlashcardsTab()}
+              {activeTab === 'Quizzes' && renderQuizzesTab()}
             </div>
           </div>
         )
