@@ -1,124 +1,153 @@
-import React from 'react'
+import React,{useState, useEffect} from 'react'
+import PageHeader from '../../components/common/PageHeader'
+import Button from '../../components/common/Button'
+import Spinner from '../../components/common/Spinner'
+import authService from "../../services/authService"
+import {useAuth} from "../../context/AuthContext"
+import toast from "react-hot-toast"
+import {User, Mail,Lock} from "lucide-react"
 
 const ProfilePage = () => {
+  
+  const [loading, setLoading] = useState(true);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const[username, setUsername] = useState("");
+  const [email, setEmail]= useState("");
+ const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
+
+
+   useEffect(()=>{
+    const fetchProfile = async ()=>{
+      try{
+        const{data} = await authSerive.getProfile();
+        setUsername(data.username);
+        setEmail(data.email)
+      }catch(error){
+        toast.error("failed to fetch profile data")
+        console.error(error)
+      }finally{
+          setLoading(false)
+      }
+    }
+    fetchProfile();
+   },[])
+
+   const handleChangePassword = async(e)=>{
+    e.preventDefault();
+    if(newPassword !== confirmNewPassword){
+      toast.error("New passwords do not match")
+      return 
+    }
+    if(newPassword.length<6){
+      toast.error("NewPassword must be at least 6 characters long")
+      return
+    }
+    setPasswordLoading(true);
+    try{
+      await authService.changePassword({currentPassword, newPassword});
+      toast.success("password changed successfully")
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmNewPassword("")
+
+    }catch(error){
+      toast.error(error.message || "failed to change password")
+    }finally{
+      setPasswordLoading(false);
+    }
+   }
+
+   if(loading){
+    return <Spinner/>
+   }
+
   return (
    <>
-    <div className="p-6 bg-gray-100 min-h-screen"> <h1 className="text-2xl font-bold mb-4">Profile Settings</h1>
+    <div>
+      <PageHeader title="Profile Settings"/>
+      <div className="space-y-8">
+        <div className="bg-white border border-neutral-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+            User Information
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1.5">
+                Username
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className='h-4 w-4 text-neutral-400'/>
 
-<div className="bg-white p-4 rounded-2xl shadow mb-6">
-    <h2 className="font-semibold mb-2">User Information</h2>
+                </div>
+                <p className="w-full h-9 pl-9 pr-3 pt-2 border border-neutral-200 rounded-lg bg-neutral-50 text-sm text-neutral-900">{username}</p>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1.5">Email Address</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className='h-4 w-4 text-neutral-400'/>
+                  </div>
+                  <p className="w-full h-9 pl-9 pr-3 pt-2 border border-neutral-200 rounded-lg bg-neutral-50 text-sm text-neutral-900">{email}</p>
+                </div>
+            </div>
+          </div>
+        </div>
+        {/* change password form */}
+        <div className="bg-white border border-neutral-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+            Change Password
+          </h3>
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1.5">Current Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className='h-4 w-4 text-neutral-400'/>
+                  </div>
+                <input type="password" value={currentPassword} 
+                onChange={(e)=>setCurrentPassword(e.target.value)} required className="w-full h-9 pl-9 pr-3 pt-2 border border-neutral-200 rounded-lg bg-neutral-50 text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none  focus:ring-2 focus:ring-[#00d49] focus:border-transparent"/>
+              </div>
+            </div>
 
-    <input
-      type="text"
-      placeholder="Username"
-      defaultValue=""
-      className="w-full border p-2 rounded mb-3"
-    />
+             <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1.5">New Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className='h-4 w-4 text-neutral-400'/>
+                  </div>
+                <input type="password" value={newPassword} 
+                onChange={(e)=>setNewPassword(e.target.value)} required className="w-full h-9 pl-9 pr-3 pt-2 border border-neutral-200 rounded-lg bg-neutral-50 text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none  focus:ring-2 focus:ring-[#00d49] focus:border-transparent"/>
+              </div>
+            </div>
 
-    <input
-      type="email"
-      placeholder="Email"
-      defaultValue=""
-      className="w-full border p-2 rounded"
-    />
-  </div>
-
-  <div className="bg-white p-4 rounded-2xl shadow">
-    <h2 className="font-semibold mb-2">Change Password</h2>
-
-    <input
-      type="password"
-      placeholder="Current Password"
-      className="w-full border p-2 rounded mb-3"
-    />
-
-    <input
-      type="password"
-      placeholder="New Password"
-      className="w-full border p-2 rounded mb-3"
-    />
-
-    <input
-      type="password"
-      placeholder="Confirm New Password"
-      className="w-full border p-2 rounded"
-    />
-
-    <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg">
-      Update Password
-    </button>
-  </div>
-</div>
-
+             <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1.5">Confirm New Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className='h-4 w-4 text-neutral-400'/>
+                  </div>
+                <input type="password" value={confirmNewPassword} 
+                onChange={(e)=>setConfirmNewPassword(e.target.value)} required className="w-full h-9 pl-9 pr-3 pt-2 border border-neutral-200 rounded-lg bg-neutral-50 text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none  focus:ring-2 focus:ring-[#00d49] focus:border-transparent"/>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button type='submit' disabled={passwordLoading}>
+                {passwordLoading ? "Changeing..." :"Change Password"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
    </>
   )
 }
 
 export default ProfilePage
-
-// // PAGE 1: Dashboard.jsx import React from "react";
-
-// export default function Dashboard() { return ( <div className="p-6 bg-gray-100 min-h-screen"> <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-
-// <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//     <div className="bg-white p-4 rounded-2xl shadow">
-//       <h2 className="text-gray-500">Total Documents</h2>
-//       <p className="text-2xl font-bold">4</p>
-//     </div>
-
-//     <div className="bg-white p-4 rounded-2xl shadow">
-//       <h2 className="text-gray-500">Total Flashcards</h2>
-//       <p className="text-2xl font-bold">50</p>
-//     </div>
-
-//     <div className="bg-white p-4 rounded-2xl shadow">
-//       <h2 className="text-gray-500">Total Quizzes</h2>
-//       <p className="text-2xl font-bold">4</p>
-//     </div>
-//   </div>
-
-//   <div className="mt-6 bg-white p-4 rounded-2xl shadow">
-//     <h2 className="font-semibold mb-3">Recent Activity</h2>
-//     {["React Concepts Detailed", "CSS Guide", "JavaScript Guide"].map((item, i) => (
-//       <div key={i} className="flex justify-between border-b py-2">
-//         <span>Accessed Document: {item}</span>
-//         <button className="text-green-500">View</button>
-//       </div>
-//     ))}
-//   </div>
-// </div>
-
-// ); }
-
-// // PAGE 2: Flashcards.jsx (Only 2 cards) import React from "react";
-
-// const cards = [ { title: "React JS Guide", progress: "50%", reviewed: "5/10" }, { title: "HTML Guide", progress: "20%", reviewed: "2/10" }, ];
-
-// export function Flashcards() { return ( <div className="p-6 bg-gray-100 min-h-screen"> <h1 className="text-2xl font-bold mb-4">Flashcard Sets</h1>
-
-// <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//     {cards.map((card, i) => (
-//       <div key={i} className="bg-white p-4 rounded-2xl shadow">
-//         <h2 className="font-semibold">{card.title}</h2>
-//         <p className="text-sm text-gray-500">Progress: {card.reviewed}</p>
-
-//         <div className="w-full bg-gray-200 h-2 rounded mt-2">
-//           <div
-//             className="bg-green-500 h-2 rounded"
-//             style={{ width: card.progress }}
-//           ></div>
-//         </div>
-
-//         <button className="mt-4 bg-green-400 text-white px-4 py-2 rounded-lg">
-//           Study Now
-//         </button>
-//       </div>
-//     ))}
-//   </div>
-// </div>
-
-// ); }
-
-// PAGE 3: Profile.jsx import React from "react";
 
