@@ -19,7 +19,7 @@ import Spinner from "../../components/common/Spinner";
 import EmptyState from "../../components/common/EmptyState";
 import Button from "../../components/common/Button";
 import Modal from "../../components/common/Modal";
-import Flashcard from "../../components/Flashcard";
+import Flashcard from "../../components/Flashcards/Flashcard";
 
 const FlashcardPage = () => {
 
@@ -80,8 +80,7 @@ const FlashcardPage = () => {
   };
 
 const handleReview = async (index) => {
-
-const currentCard = flashcards[currentCardIndex];
+  const currentCard = flashcards[index];
 if (!currentCard) return;
 
 try {
@@ -113,7 +112,7 @@ const handleDeleteFlashcardSet = async () => {
   setDeleting(true);
 
   try {
-    await flashcardService.deleteFlashcardSet(flashcardSets._id);
+    await flashcardService.deleteFlashcardSet(flashcardSets[0]._id);
 
     toast.success("Flashcard set deleted successfully");
     setIsDeleteModalOpen(false)
@@ -138,7 +137,7 @@ const renderFlashcardContent=()=>{
     />
   );
 }
-const currentCard = flashcards(currentCardIndex);
+const currentCard = flashcards[currentCardIndex];
 
 return (
   <div className=" flex flex-col items-center space-y-6">

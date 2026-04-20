@@ -31,7 +31,7 @@ const Sidebar = ({isSidebarOpen, toggleSidebar}) => {
       />
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white/90 backdrop-blur-lg border-r border-slate-200/60 z-50 md:relative md:w-64 md:shrink-0 md:flex md:flex-col md:translate-x-0 transition-transform duration-300 ease-in-out ${
+        className={`flex flex-col fixed top-0 left-0 h-full w-64 bg-white/90 backdrop-blur-lg border-r border-slate-200/60 z-50 md:relative md:w-64 md:shrink-0 md:flex md:flex-col md:translate-x-0 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -64,7 +64,8 @@ const Sidebar = ({isSidebarOpen, toggleSidebar}) => {
       </div>
 
       {/* Navigation */}
-      <nav className="">
+      <nav className="flex-1 overflow-y-auto px-3 py-4"
+>
         {navLinks.map((link) => (
           <NavLink
             key={link.to}
@@ -92,7 +93,7 @@ const Sidebar = ({isSidebarOpen, toggleSidebar}) => {
       </nav>
 
       {/* Logout Button */}
-      <div className='px-3 py-4 border-t border-slate-200/60'>
+      <div className='px-3   py-4 border-t border-slate-200/60'>
         <button onClick={handleLogout} className='group flex items-center gap-3 w-full px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 mt-auto '>
       
         <LogOut size={18} strokeWidth={2.5} className='transition-transform duration-200 group-hover:scale-110' />

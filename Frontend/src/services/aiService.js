@@ -1,11 +1,15 @@
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS  } from "../utils/apiPaths";
 
+const AI_REQUEST_TIMEOUT_MS = 60000;
+
 const generateFlashcards =  async(documentId, options)=>{
   try{
     const response = await axiosInstance.post(API_PATHS.AI.GENERATE_FLASHCARDS,{
       documentId,
       ...options,
+    },{
+      timeout: AI_REQUEST_TIMEOUT_MS
     })
 
     return response.data;
@@ -19,6 +23,8 @@ const generateQuiz =  async(documentId, options)=>{
     const response = await axiosInstance.post(API_PATHS.AI.GENERATE_QUIZ,{
       documentId,
       ...options,
+    },{
+      timeout: AI_REQUEST_TIMEOUT_MS
     })
 
     return response.data;
@@ -33,6 +39,8 @@ const generateSummary =  async(documentId)=>{
     const response = await axiosInstance.post(API_PATHS.AI.GENERATE_SUMMARY,{
       documentId,
    
+    },{
+      timeout: AI_REQUEST_TIMEOUT_MS
     })
 
     return response.data;
@@ -46,6 +54,8 @@ const chat =  async(documentId, message)=>{
     const response = await axiosInstance.post(API_PATHS.AI.CHAT,{
       documentId,
       question: message
+    },{
+      timeout: AI_REQUEST_TIMEOUT_MS
     })
 
     return response.data;
@@ -58,6 +68,8 @@ const explainConcept =  async(documentId, concept)=>{
     const response = await axiosInstance.post(API_PATHS.AI.EXPLAIN_CONCEPT,{
       documentId,
       concept,
+    },{
+      timeout: AI_REQUEST_TIMEOUT_MS
     })
 
     return response.data;

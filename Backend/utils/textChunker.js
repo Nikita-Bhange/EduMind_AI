@@ -13,7 +13,7 @@ export const chunkText = (text, chunkSize = 500, overlap = 50) => {
   // Clean text while preserving paragraph structure
   const cleanedText = text
     .replace(/\r\n/g, '\n')
-    .replace(/\s+/g, ' ')
+    .replace(/[ \t]+/g, ' ')
     .replace(/\n /g, '\n')
     .replace(/ \n/g, '\n')
     .trim();
@@ -67,7 +67,7 @@ if (currentWordCount + paragraphWordCount > chunkSize && currentChunk.length > 0
   });
 
   //create overlap from previous chunk
-  const prevChunkText = currentChunk.join('');
+  const prevChunkText = currentChunk.join(' ');
   const pervWords = prevChunkText.split(/\s+/);
   const overlapText = pervWords.slice(-Math.min(overlap,pervWords.length)).join(' ');
 
@@ -90,12 +90,12 @@ currentWordCount = overlapText.split(/\s+/).length +paragraphWordCount;
   }
 
   //fallback if no chunks created, split by words
-  if(chunks,length === 0 && cleanedText.length>0){
+  if(chunks.length === 0 && cleanedText.length>0){
     const allWords = cleanedText.split(/\s+/)
     for (let i=0;i<allWords.length; i+=(chunkSize -overlap)){
         const chunkWords = allWords.slice(i,i+chunkSize);
-        chunkIndex.push({
-            content:chunkWords.join(''),
+        chunks.push({
+            content:chunkWords.join(' '),
             chunkIndex:chunkIndex++,
             pageNumber:0
         })

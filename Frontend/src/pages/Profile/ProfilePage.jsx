@@ -3,7 +3,6 @@ import PageHeader from '../../components/common/PageHeader'
 import Button from '../../components/common/Button'
 import Spinner from '../../components/common/Spinner'
 import authService from "../../services/authService"
-import {useAuth} from "../../context/AuthContext"
 import toast from "react-hot-toast"
 import {User, Mail,Lock} from "lucide-react"
 
@@ -22,7 +21,7 @@ const ProfilePage = () => {
    useEffect(()=>{
     const fetchProfile = async ()=>{
       try{
-        const{data} = await authSerive.getProfile();
+        const{data} = await authService.getProfile();
         setUsername(data.username);
         setEmail(data.email)
       }catch(error){

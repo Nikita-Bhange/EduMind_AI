@@ -100,7 +100,7 @@ const ChatInterface = () => {
 
         ) : (
           <div className="">
-          <MarkdownRenderer content={msg.content} />
+          <MarkdownRender content={msg.content} />
           </div>
         )}
         </div>
@@ -192,9 +192,9 @@ const ChatInterface = () => {
             <button
               type="submit"
               disabled={loading || !message.trim()}
-              className="shrink-0 w-12 h-12 bg-linear-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-emerald-300 disabled:to-teal-300 transition-colors"
+              className="shrink-0 w-12 h-12 bg-linear-to-br rounded-full flex items-center from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-emerald-300 disabled:to-teal-300 transition-colors"
             >
-              <Send className="w-4 h-4 text-white" strokeWidth={2} />
+              <Send className="w-5 h-5 ml-2.5 text-white" strokeWidth={3} />
             </button>
           </form>
 

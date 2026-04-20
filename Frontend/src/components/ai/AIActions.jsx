@@ -16,18 +16,25 @@ const AIActions = () => {
   const [concept, setConcept] = useState("");
 
   const handleGenerateSummary = async () => {
-    setLoadingAction("summary");
-    try {
-      const { summary } = await aiService.generateSummary(documentId);
-      setModalTitle("Generated Summary");
-      setModalContent(summary);
-      setIsModalOpen(true);
-    } catch (error) {
-      toast.error("Failed to generate summary.");
-    } finally {
-      setLoadingAction(null);
-    }
-  };
+  setLoadingAction("summary");
+  try {
+    const response = await aiService.generateSummary(documentId);
+    console.log("Summary response:", response); // ← add this temporarily
+
+    // Then adjust destructuring to match actual shape, e.g.:
+    const summary = response?.summary || response?.data?.summary || response;
+
+    setModalTitle("Generated Summary");
+    setModalContent(summary);
+    setIsModalOpen(true);
+  } catch (error) {
+    console.error(error); // ← also add this so silent errors show
+    toast.error("Failed to generate summary.");
+  } finally {
+    setLoadingAction(null);
+  }
+};
+
 
   const handleExplainConcept = async (e) => {
     e.preventDefault();
@@ -40,10 +47,13 @@ const AIActions = () => {
     setLoadingAction("explain");
 
     try {
-      const { explanation } = await aiService.explainConcept(
-        documentId,
-        concept
-      );
+      // const { explanation } = await aiService.explainConcept(
+      //   documentId,
+      //   concept
+      // );
+      const response = await aiService.explainConcept(documentId, concept);
+        console.log("Explain response:", response);
+      const explanation = response?.explanation || response?.data?.explanation || response;
 
       setModalTitle(`Explanation of "${concept}"`);
       setModalContent(explanation);
@@ -161,7 +171,7 @@ const AIActions = () => {
 </div>
 
 <Modal isOpen={isModalOpen}
-     onclose={() => setIsModalOpen(false)}
+     onClose={() => setIsModalOpen(false)}
      title={modalTitle}
      onClose={() => setIsModalOpen(false)}>
      <div className="max-h-[60vh] overflow-y-auto prose prose-sm max-w-none prose-slate">

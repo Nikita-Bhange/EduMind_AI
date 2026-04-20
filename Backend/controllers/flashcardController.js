@@ -64,7 +64,7 @@ export const reviewFlashcard = async(req, res, next)=>{
 
         if (cardIndex ===-1){
             return  res.status(404).json({
-                success:flase,
+                success:false,
              error: 'card not found in set',
                 statusCode:404
             });
@@ -72,7 +72,7 @@ export const reviewFlashcard = async(req, res, next)=>{
 
         //update review info
         flashcardSet.cards[cardIndex].lastReviewed = new Date();
-        flashcardSet.card[cardIndex].reviewCount +=1;
+        flashcardSet.cards[cardIndex].reviewCount +=1;
 
         await flashcardSet.save();
          res.status(200).json({
@@ -108,7 +108,7 @@ export const toggleStarFlashcard = async(req,res, next)=>{
 
         if (cardIndex ===-1){
             return  res.status(404).json({
-                success:flase,
+                success:false,
              error: 'card not found in set',
                 statusCode:404
             });
@@ -138,7 +138,7 @@ export const toggleStarFlashcard = async(req,res, next)=>{
 export const deleteFlashcardSet= async(req,res,next)=>{
 try{
         const flashcardSet = await Flashcard.findOne({
-            'cards._id':req.params.cardId,
+            _id:req.params.id,
             userId: req.user._id
         })
 

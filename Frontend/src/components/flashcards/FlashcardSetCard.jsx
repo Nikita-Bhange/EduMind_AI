@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate,Link } from "react-router-dom";
-import { BookOpen, Sparkles, TrendingUp } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { BookOpen, Sparkles, TrendingUp, Trash2 } from "lucide-react";
 import moment from "moment";
 
 
-const FlashcardSetCard = ({ flashcardSet }) => {
+const FlashcardSetCard = ({ flashcardSet, onDelete }) => {
 
     const navigate = useNavigate();
     const handleStudyNow =() =>{
@@ -21,6 +21,20 @@ const FlashcardSetCard = ({ flashcardSet }) => {
       className="group relative bg-white/80 backdrop-blur-xl border-2 border-slate-200 hover:border-emerald-300 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10 fle flex-col justify-between"
       onClick={handleStudyNow}
     >
+      {typeof onDelete === "function" && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(flashcardSet);
+          }}
+          className="absolute top-3 right-3 p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+          aria-label="Delete flashcard set"
+          title="Delete flashcard set"
+        >
+          <Trash2 className="w-4 h-4" strokeWidth={2} />
+        </button>
+      )}
         <div className="space-y-4">
       {/* Icon and Title */}
       <div className="flex items-start gap-4">

@@ -15,7 +15,7 @@ const DocumentDetailPage = () => {
   const { id } = useParams();
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('content');
+  const [activeTab, setActiveTab] = useState('Content');
 
                 useEffect(() => {
                   const fetchDocumentDetails = async () => {
@@ -44,7 +44,7 @@ const DocumentDetailPage = () => {
                   return filePath;
                 }
 
-                const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+                const baseUrl =  'http://localhost:8000';
                 return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
               };
 
@@ -103,7 +103,7 @@ const DocumentDetailPage = () => {
                 return <FlashcardManager documentId={id}/>;
               };
               const renderQuizzesTab = () => {
-                return <QuizManager/>
+                return <QuizManager documentId={id}/>
               };
 
 

@@ -25,14 +25,14 @@ const app = express();
 
 
  //Middleware to handle CORS
- app.use(
-    cors({
-        origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:5173",
-        methods: ["GET", "PUT", "POST", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-    })
- )
+app.use(
+  cors({
+    origin: true, // allow all origins
+    methods: ["GET", "PUT", "POST", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
  app.use(express.json())
  app.use(express.urlencoded({extended:true}));
@@ -43,7 +43,7 @@ const app = express();
  //Routes
  app.use('/api/auth',authRoutes)
  app.use('/api/documents',documentRoutes)
-app.use('/api/flashcard',flashcardRoutes)
+app.use('/api/flashcards',flashcardRoutes)
 app.use('/api/quizzes',quizRoutes)
 app.use('/api/ai',aiRoutes)
 app.use('/api/progress',progressRoutes)

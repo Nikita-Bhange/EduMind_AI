@@ -12,7 +12,7 @@ const getAllFlashcardSets=  async()=>{
   }
 }
 
-const getAllFlashcardsForDocument=  async(documentId)=>{
+const getFlashcardsForDocument=  async(documentId)=>{
   try{
     const response = await axiosInstance.get(API_PATHS.FLASHCARDS.GET_FLASHCARDS_FOR_DOC(documentId));
 
@@ -54,7 +54,7 @@ const deleteFlashcardSet=  async(id)=>{
 
 const flashcardService ={
     getAllFlashcardSets,
-    getAllFlashcardsForDocument,
+    getFlashcardsForDocument,
     reviewFlashcard,
     toggleStar,
     deleteFlashcardSet

@@ -48,7 +48,7 @@ export const getQuizById= async(req,res,next)=>{
 
 export const submitQuiz = async(req,res,next)=>{
     try{
-        const {answer} = req.body;
+        const { answers } = req.body;
 
         if(!Array.isArray(answers)){
             return res.status(400).json({
@@ -85,7 +85,7 @@ export const submitQuiz = async(req,res,next)=>{
          answers.forEach(answer=>{
             const {questionIndex, selectedAnswer} = answer;
 
-            if(questionIndex <Quiz.questions.length){
+            if(questionIndex < quiz.questions.length){
                 const question = quiz.questions[questionIndex]
                 const isCorrect = selectedAnswer === question.correctAnswer;
                  if(isCorrect) correctCount++;
@@ -103,9 +103,9 @@ export const submitQuiz = async(req,res,next)=>{
          const score = Math.round((correctCount/quiz.totalQuestions)*100)
 
          //update quiz
-         Quiz.userAnswers = userAnswers;
-         Quiz.score = score;
-         Quiz.completedAt = new Date()
+         quiz.userAnswers = userAnswers;
+         quiz.score = score;
+         quiz.completedAt = new Date()
 
          await  quiz.save();
 
@@ -116,7 +116,7 @@ export const submitQuiz = async(req,res,next)=>{
                 score,
                 correctCount,
                 totalQuestions:quiz.totalQuestions,
-                percentage:true,
+                percentage:score,
                 userAnswers
             },
             message:'Quiz submitted successfully'
@@ -159,7 +159,7 @@ export const getQuizResults = async(req,res,next)=>{
                 question:question.question,
                 options:question.options,
                 correctAnswer:question.correctAnswer,
-                selectedAnswer:userAnswer?.selectAnswer || null,
+                selectedAnswer:userAnswer?.selectedAnswer || null,
                 isCorrect:userAnswer?.isCorrect ||false,
                 explanation:question.explanation
             }

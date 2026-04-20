@@ -4,6 +4,60 @@ import Quiz from "../models/Quiz.js";
 import ChatHistory from "../models/ChatHistory.js";
 import * as geminiService from "../utils/geminiService.js";
 import { findRelevantChunks } from "../utils/textChunker.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const documentsDir = path.join(__dirname, "../uploads/documents");
+
+const normalizeText = (text = "") =>
+  text
+    .replace(/--\s*\d+\s+of\s+\d+\s*--/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const hasMeaningfulExtractedText = (text = "") => {
+  const normalized = normalizeText(text);
+  return normalized.length >= 120 && /[a-zA-Z]{3,}/.test(normalized);
+};
+
+const getLocalDocumentPath = (document) => {
+  let fileName;
+
+  try {
+    fileName = decodeURIComponent(path.basename(new URL(document.filePath).pathname));
+  } catch {
+    fileName = path.basename(document.filePath);
+  }
+
+  return path.join(documentsDir, fileName);
+};
+
+const getDocumentAiSource = async (document) => {
+  let pdfPart = null;
+
+  if (document.aiFileUri && document.aiFileMimeType) {
+    pdfPart = geminiService.createPartFromStoredUri?.(document.aiFileUri, document.aiFileMimeType);
+  }
+
+  if (!pdfPart) {
+    const localPath = getLocalDocumentPath(document);
+    const { file, part } = await geminiService.uploadPdfAndCreatePart(localPath, document.fileName);
+    document.aiFileUri = file.uri || "";
+    document.aiFileMimeType = file.mimeType || "application/pdf";
+    document.aiFileName = file.name || "";
+    await document.save();
+    pdfPart = part;
+  }
+
+  const extractedText = hasMeaningfulExtractedText(document.extractedText) ? normalizeText(document.extractedText) : "";
+
+  return {
+    pdfPart,
+    text: extractedText,
+  };
+};
 
 export const generateFlashcards = async (req, res, next) => {
   try {
@@ -12,18 +66,28 @@ export const generateFlashcards = async (req, res, next) => {
     if (!documentId) {
       return res.status(400).json({ success: false, error: 'Document ID is required', statusCode: 400 });
     }
-
+console.log(documentId,req.user._id)
     const document = await Document.findOne({
       _id: documentId,
       userId: req.user._id,
-      status: 'ready'
+      // status: 'ready'
     });
 
     if (!document) {
-      return res.status(404).json({ success: false, error: 'Document not found or not ready', statusCode: 404 });
+      console.log("document doesnt exist")
+      return res.status(400).json({ success: false, error: 'Document not found or not ready', statusCode: 400 });
     }
 
-    const cards = await geminiService.generateFlashcards(document.extractedtext || '', parseInt(count, 10));
+    const aiSource = await getDocumentAiSource(document);
+    const cards = await geminiService.generateFlashcards(aiSource, parseInt(count, 10));
+
+    if (!cards.length) {
+      return res.status(400).json({
+        success: false,
+        error: 'The uploaded PDF does not contain enough readable content to generate flashcards',
+        statusCode: 400
+      });
+    }
 
     const flashcardSet = await Flashcard.create({
       userId: req.user._id,
@@ -49,6 +113,11 @@ export const generateFlashcards = async (req, res, next) => {
 export const generateQuiz = async (req, res, next) => {
   try {
     const { documentId, numQuestions = 5, title } = req.body;
+    const parsedQuestionCount = parseInt(numQuestions, 10);
+    const normalizedQuestionCount = Math.min(
+      10,
+      Math.max(1, Number.isNaN(parsedQuestionCount) ? 5 : parsedQuestionCount)
+    );
 
     if (!documentId) {
       return res.status(400).json({ success: false, error: 'Document ID is required', statusCode: 400 });
@@ -57,14 +126,23 @@ export const generateQuiz = async (req, res, next) => {
     const document = await Document.findOne({
       _id: documentId,
       userId: req.user._id,
-      status: 'ready'
+      // status: 'ready'
     });
 
     if (!document) {
       return res.status(404).json({ success: false, error: 'Document not found or not ready', statusCode: 404 });
     }
 
-    const questions = await geminiService.generateQuiz(document.extractedtext || '', parseInt(numQuestions, 10));
+    const aiSource = await getDocumentAiSource(document);
+    const questions = await geminiService.generateQuiz(aiSource, normalizedQuestionCount);
+
+    if (!questions.length) {
+      return res.status(400).json({
+        success: false,
+        error: 'The uploaded PDF does not contain enough readable content to generate a quiz',
+        statusCode: 400
+      });
+    }
 
     const quiz = await Quiz.create({
       userId: req.user._id,
@@ -72,7 +150,7 @@ export const generateQuiz = async (req, res, next) => {
       title: title || `${document.title}-Quiz`,
       questions,
       totalQuestions: questions.length,
-      userAnswer: [],
+      userAnswers: [],
       score: 0
     });
 
@@ -105,7 +183,8 @@ export const generateSummary = async (req, res, next) => {
       return res.status(404).json({ success: false, error: 'Document not found or not ready', statusCode: 404 });
     }
 
-    const summary = await geminiService.generateSummary(document.extractedtext || '');
+    const aiSource = await getDocumentAiSource(document);
+    const summary = await geminiService.generateSummary(aiSource);
 
     return res.status(200).json({
       success: true,
@@ -140,7 +219,10 @@ export const chat = async (req, res, next) => {
       return res.status(404).json({ success: false, error: 'Document not found or not ready', statusCode: 404 });
     }
 
-    const chunks = await findRelevantChunks(document.chunks || [], question, 3);
+    const aiSource = await getDocumentAiSource(document);
+    const chunks = hasMeaningfulExtractedText(document.extractedText)
+      ? await findRelevantChunks(document.chunks || [], question, 3)
+      : [];
     const chunkIndices = chunks.map(c => c.chunkIndex);
 
     let chatHistory = await ChatHistory.findOne({
@@ -156,7 +238,7 @@ export const chat = async (req, res, next) => {
       });
     }
 
-    const answer = await geminiService.chatWithContext(question, chunks);
+    const answer = await geminiService.chatWithContext(question, chunks, aiSource);
 
     chatHistory.messages.push(
       {
@@ -209,10 +291,13 @@ export const explainConcept = async (req, res, next) => {
       return res.status(404).json({ success: false, error: 'Document not found or not ready', statusCode: 404 });
     }
 
-    const relevantChunks = await findRelevantChunks(document.chunks || [], concept, 3);
+    const aiSource = await getDocumentAiSource(document);
+    const relevantChunks = hasMeaningfulExtractedText(document.extractedText)
+      ? await findRelevantChunks(document.chunks || [], concept, 3)
+      : [];
     const context = relevantChunks.map(c => c.content).join('\n\n');
 
-    const explanation = await geminiService.explainConcept(concept, context);
+    const explanation = await geminiService.explainConcept(concept, context, aiSource);
 
     return res.status(200).json({
       success: true,

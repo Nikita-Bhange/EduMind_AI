@@ -45,6 +45,6 @@ const flashcardSchema = new mongoose.Schema({
 //Index for faster queries
 flashcardSchema.index({userId:1, documentId:1});
 
-const Flashcard = mongoose.model('Quiz', flashcardSchema);
+const Flashcard = mongoose.model('Flashcard', flashcardSchema);
 
 export default Flashcard;

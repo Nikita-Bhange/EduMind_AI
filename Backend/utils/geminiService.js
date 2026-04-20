@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, createPartFromUri } from '@google/genai';
 
 dotenv.config();
 
@@ -10,31 +10,86 @@ if (!process.env.GEMINI_API_KEY) {
   process.exit(1);
 }
 
+const normalizeSource = (source) => {
+  if (typeof source === 'string') {
+    return { text: source, pdfPart: null };
+  }
+
+  return {
+    text: source?.text || '',
+    pdfPart: source?.pdfPart || null,
+  };
+};
+
+const buildContents = (prompt, source, textLimit = 15000) => {
+  const { text, pdfPart } = normalizeSource(source);
+  const contents = [prompt];
+
+  if (pdfPart) {
+    contents.push(pdfPart);
+  }
+
+  if (text.trim()) {
+    contents.push(`Supplemental extracted text from the same PDF:\n${text.substring(0, textLimit)}`);
+  }
+
+  return contents;
+};
+
+export const uploadPdfAndCreatePart = async (filePath, displayName = 'document.pdf') => {
+  try {
+    const uploadedFile = await ai.files.upload({
+      file: filePath,
+      config: {
+        mimeType: 'application/pdf',
+        displayName,
+      },
+    });
+
+    return {
+      file: uploadedFile,
+      part: createPartFromUri(uploadedFile.uri, uploadedFile.mimeType || 'application/pdf'),
+    };
+  } catch (error) {
+    console.error('Gemini file upload error:', error);
+    throw new Error('Failed to upload PDF to Gemini');
+  }
+};
+
+export const createPartFromStoredUri = (uri, mimeType = 'application/pdf') =>
+  createPartFromUri(uri, mimeType);
+
 /**
  * Generate flashcards from text
  * @param {string} text - Document text
  * @param {number} count - Number of flashcards to generate
  * @returns {Promise<Array<{question: string, answer: string, difficulty: string}>>}
  */
-export const generateFlashcards = async (text, count = 10) => {
-  const prompt = `Generate exactly ${count} educational flashcards from the following text.
+export const generateFlashcards = async (source, count = 10) => {
+  const prompt = `Generate exactly ${count} educational flashcards strictly from the attached document.
+Do not use outside knowledge.
+If the document does not contain enough readable content, return exactly:
+INSUFFICIENT_CONTENT
+
 Format each flashcard as:
 Q: [Clear, specific question]
 A: [Concise, accurate answer]
 D: [Difficulty level: easy, medium, or hard]
 
 Separate each flashcard with "---"
-
-Text:
-${text.substring(0, 15000)}`;
+`;
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-lite',
-      contents: prompt,
+      contents: buildContents(prompt, source),
     });
 
-    const generatedText = response.text;
+    const generatedText = response.text || '';
+
+    if (generatedText.includes('INSUFFICIENT_CONTENT')) {
+      return [];
+    }
 
     // Parse the response
     const flashcards = [];
@@ -75,8 +130,12 @@ ${text.substring(0, 15000)}`;
  * @param {number} numQuestions - Number of questions
  * @returns {Promise<Array<{question: string, options: Array, correctAnswer: string, explanation: string, difficulty: string}>>}
  */
-export const generateQuiz = async (text, numQuestions = 5) => {
-  const prompt = `Generate exactly ${numQuestions} multiple choice questions from the following text.
+export const generateQuiz = async (source, numQuestions = 5) => {
+  const prompt = `Generate exactly ${numQuestions} multiple choice questions strictly from the attached document.
+Do not use outside knowledge.
+If the document does not contain enough readable content, return exactly:
+INSUFFICIENT_CONTENT
+
 Format each question as:
 
 Q: [Question]
@@ -89,17 +148,19 @@ E: [Brief explanation]
 D: [Difficulty: easy, medium, or hard]
 
 Separate questions with "---"
-
-Text:
-${text.substring(0, 15000)}`;
+`;
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-lite',
-      contents: prompt,
+      contents: buildContents(prompt, source),
     });
 
-    const generatedText = response.text;
+    const generatedText = response.text || '';
+
+    if (generatedText.includes('INSUFFICIENT_CONTENT')) {
+      return [];
+    }
 
     const questions = [];
     const questionBlocks = generatedText.split('---').filter(q => q.trim());
@@ -156,17 +217,20 @@ ${text.substring(0, 15000)}`;
  * @param {string} text - Document text
  * @returns {Promise<string>}
  */
-export const generateSummary = async (text) => {
-  const prompt = `Provide a concise summary of the following text, highlighting the key concepts, main ideas, and 
-keep the summary clear and structured.
+export const generateSummary = async (source) => {
+  const prompt = `Summarize the attached document clearly and accurately.
+Focus only on the document content.
+If the document is unreadable or does not contain enough meaningful content, say that plainly.
 
-Text:
-${text.substring(0, 20000)}`;
+Structure the response as:
+1. Main topic
+2. Key points
+3. Important details or examples`;
 
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-lite",
-      contents: prompt,
+      contents: buildContents(prompt, source, 20000),
     });
 
     const generatedText = response.text;
@@ -184,13 +248,13 @@ ${text.substring(0, 20000)}`;
  * @param {Array<Object>} chunks - Relevant document chunks
  * @returns {Promise<string>}
  */
-export const chatWithContext = async (question, chunks) => {
+export const chatWithContext = async (question, chunks, source = null) => {
   const context = chunks
     .map((c, i) => `Chunk ${i + 1}:\n${c.content}`)
     .join("\n\n");
 
-  const prompt = `Based on the following context from a document, analyse the context and answer the user's question.
-If the answer is not in the context, say so.
+  const prompt = `Answer the user's question using only the attached document and any provided extracted context.
+If the answer is not supported by the document, say so clearly.
 
 Context:
 ${context}
@@ -202,7 +266,7 @@ Answer:`;
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-lite",
-      contents: prompt,
+      contents: buildContents(prompt, source, 12000),
     });
 
     const generatedText = response.text;
@@ -218,8 +282,8 @@ Answer:`;
  * @param {string} context - Relevant context
  * @returns {Promise<string>}
  */
-export const explainConcept = async (concept, context) => {
-  const prompt = `Explain the concept of "${concept}" based on the following context.
+export const explainConcept = async (concept, context, source = null) => {
+  const prompt = `Explain the concept of "${concept}" using only the attached document and the provided context.
 Provide a clear, educational explanation that's easy to understand.
 Include examples if relevant.
 
@@ -229,7 +293,7 @@ ${context.substring(0, 10000)}`;
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-lite',
-      contents: prompt,
+      contents: buildContents(prompt, source, 10000),
     });
 
     const generatedText = response.text;

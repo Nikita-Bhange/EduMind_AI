@@ -76,9 +76,18 @@ const DocumentListPage = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedDoc) return;
-    await handleDeleteRequest(selectedDoc);
-    setIsDeleteModalOpen(false);
-    setSelectedDoc(null);
+    setDeleting(true);
+    try {
+      await documentService.deleteDocuments(selectedDoc._id);
+      setDocuments((prevDocs) => prevDocs.filter((doc) => doc._id !== selectedDoc._id));
+      toast.success("Document deleted successfully.");
+      setIsDeleteModalOpen(false);
+      setSelectedDoc(null);
+    } catch (error) {
+      toast.error(error.message || "Failed to delete document.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   const renderContent = () => {
@@ -205,9 +214,9 @@ const DocumentListPage = () => {
               <X className='w-5 h-5' strokeWidth={2} />
             </button>
             {/* Modal Header */}
-            <div className="mb-6 text-center">
+            <div className="mb-6 mt-1 text-center">
               <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-r from-red-100 to-red-200 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" strokeWidth={2} />
+                <Trash2 className="w-6 h-6   text-red-600" strokeWidth={2} />
               </div>
 
               <h2 className="text-xl font-medium text-slate-900 tracking-tight mt-3">
@@ -225,7 +234,7 @@ const DocumentListPage = () => {
             </p>
 
             {/* Action Buttons */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 m-3">
               {/* Cancel Button */}
               <button
                 type="button"

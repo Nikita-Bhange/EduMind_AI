@@ -4,7 +4,6 @@ import Quiz from '../models/Quiz.js'
 import {extractTextFromPDF} from '../utils/pdfParser.js'
 import{chunkText} from '../utils/textChunker.js'
 import fs from 'fs/promises'
-import mongoose from 'mongoose'
 
 //@desc upload Pdf document
 //@route post /api/documents/upload
@@ -114,7 +113,10 @@ export const getDocuments = async (req, res, next)=>{
 
 export const getDocument = async (req, res, next)=>{
     try{
-        const document = await Document.findOne({_id:req.params.id,userId:req.user._id});
+        const document = await Document.findOne({
+            _id: req.params.id,
+            userId: req.user._id
+        }).select('-extractedText -chunks').lean();
 
         if(!document){
             return res.status(404).json({
@@ -125,15 +127,19 @@ export const getDocument = async (req, res, next)=>{
         }
 
         //get counts of assciated flashcards and quizzes
-        const flashcardCount = await Flashcard.countDocuments({documentId:document._id,userId:req.user._id});
-        const quizCount = await Quiz.countDocuments({documentId:document._id,userId:req.user._id});
+        const [flashcardCount, quizCount] = await Promise.all([
+            Flashcard.countDocuments({documentId:document._id,userId:req.user._id}),
+            Quiz.countDocuments({documentId:document._id,userId:req.user._id})
+        ]);
 
-        //update last accessed
-        document.lastAccessed = Date.now();
-        await document.save();
+        //update last accessed without loading heavy document content
+        await Document.updateOne(
+            { _id: document._id, userId: req.user._id },
+            { $set: { lastAccessed: new Date() } }
+        );
 
         //combine documnt data with counts
-        const documentData = document.toObject();
+        const documentData = {...document};
         documentData.flashcardCount = flashcardCount;
         documentData.quizCount = quizCount
 

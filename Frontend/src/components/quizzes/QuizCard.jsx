@@ -4,6 +4,12 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 
 const QuizCard = ({ quiz, onDelete }) => {
+  const questionCount = Array.isArray(quiz?.questions)
+    ? quiz.questions.length
+    : Number(quiz?.totalQuestions || 0);
+  const hasQuestions = questionCount > 0;
+  const hasResults = Array.isArray(quiz?.userAnswers) && quiz.userAnswers.length > 0;
+
   return (
     <div className="group relative bg-white/80 backdrop-blur-xl border-2 border-slate-200 hover:border-emerald-300 rounded-2xl  transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10 flex-col justify-between p-4">
 
@@ -46,26 +52,30 @@ const QuizCard = ({ quiz, onDelete }) => {
         </div>
 
         {/* Quiz Info */}
-        <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
-          <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
-            <span className="text-sm font-semibold text-slate-700">
-              {quiz.questions.length}{" "}
-              {quiz.questions.length === 1 ? "Question" : "Questions"}
-            </span>
-          </div>
-        </div>
+              
+                {questionCount > 0 && (
+  <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
+    <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
+      <span className="text-sm font-semibold text-slate-700">
+        {questionCount}{" "}
+        {questionCount === 1 ? "Question" : "Questions"}
+      </span>
+    </div>
+  </div>
+)}
+
       </div>
 
       {/* Action Button */}
       <div className="mt-2 pt-4 border-t border-slate-100">
-        {quiz?.userAnswers?.length > 0 ? (
+        {hasResults ? (
           <Link to={`/quizzes/${quiz._id}/results`}>
             <button className="group/btn w-full inline-flex items-center justify-center gap-2 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition-all duration-200 active:scale-95 cursor-pointer ">
               <BarChart2 className="w-4 h-4" strokeWidth={2.5} />
               View Results
             </button>
           </Link>
-        ) : (
+        ) : hasQuestions ? (
           <Link to={`/quizzes/${quiz._id}`}>
             <button className="group/btn relative w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal=600 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25  active:scale-95 overflow-hidden">
               <span className="relative z-10 flex items-center justify-center gap-2">
@@ -75,6 +85,13 @@ const QuizCard = ({ quiz, onDelete }) => {
               <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
             </button>
           </Link>
+        ) : (
+          <button
+            disabled
+            className="w-full h-11 bg-slate-100 text-slate-400 font-semibold text-sm rounded-xl cursor-not-allowed"
+          >
+            Quiz Unavailable
+          </button>
         )}
       </div>
 

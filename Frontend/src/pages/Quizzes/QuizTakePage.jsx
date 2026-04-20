@@ -11,17 +11,33 @@ const QuizTakePage = () => {
 
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchQuiz = async () => {
+      setLoading(true);
+      setFetchError("");
+      setQuiz(null);
+      setSelectedAnswers({});
+      setCurrentQuestionIndex(0);
+
       try {
-        const data = await quizService.getQuizById(quizId);
-        setQuiz(data);
+        const response = await quizService.getQuizById(quizId);
+        const quizData = response?.data ?? response ?? null;
+
+        if (!quizData || !Array.isArray(quizData.questions) || quizData.questions.length === 0) {
+          setFetchError("Quiz not found or has no questions.");
+          return;
+        }
+
+        setQuiz(quizData);
       } catch (error) {
-        toast.error('Failed to fetch quiz.');
+        const message = error?.error || error?.message || 'Failed to fetch quiz.';
+        setFetchError(message);
+        toast.error(message);
         console.error(error);
       } finally {
         setLoading(false);
@@ -66,7 +82,7 @@ const QuizTakePage = () => {
       toast.success('Quiz submitted successfully!');
       navigate(`/quizzes/${quizId}/results`);
     } catch (error) {
-      toast.error(error.message || 'Failed to submit quiz.');
+        toast.error(error.message || 'Failed to submit quiz.');
     } finally {
       setSubmitting(false);
     }
@@ -80,12 +96,12 @@ const QuizTakePage = () => {
     );
   }
 
-  if (!quiz || quiz.questions.length === 0) {
+  if (fetchError || !quiz || !quiz.questions || quiz.questions.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <p className="text-slate-600 text-lg">
-            Quiz not found or has no questions.
+            {fetchError || 'Quiz not found or has no questions.'}
           </p>
         </div>
       </div>
@@ -153,9 +169,14 @@ const QuizTakePage = () => {
                 />
 
               {/* custom radio button */}
-              <div className={`shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200`}>
-                {isSelected ?'border-emerald-500 bg-emerald-500':'border-slate-300 bg-white group-hover:border-emerald-400'}
-                {isSelected && <div className=''><div className=''/></div>}
+              <div
+                className={`shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${
+                  isSelected
+                    ? "border-emerald-500 bg-emerald-500"
+                    : "border-slate-300 bg-white group-hover:border-emerald-400"
+                }`}
+              >
+                {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
                 <span className="ml-4 text-sm font-medium">
                   {option}

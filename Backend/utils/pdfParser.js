@@ -7,11 +7,11 @@ return{promises<{text:string, numpages:number}}
 */
 
 export const extractTextFromPDF = async(filePath)=>{
+    let parser;
     try{
         const dataBuffer = await fs.readFile(filePath);
-        //pdf-parse exprects a Unit8Array, not a Buffer
-         const parse = new PDFParse(new Unit8Array(dataBuffer));
-         const data = await parse.getText();
+        parser = new PDFParse({ data: dataBuffer });
+        const data = await parser.getText();
 
          return {
             text:data.text,
@@ -23,5 +23,9 @@ export const extractTextFromPDF = async(filePath)=>{
     catch(error){
         console.error("PDF parsing error:",error)
         throw new Error("failed to extract text from PDF");
+    } finally {
+        if (parser) {
+            await parser.destroy().catch(() => {});
+        }
     }
 }

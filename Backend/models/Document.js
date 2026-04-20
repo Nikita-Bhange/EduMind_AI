@@ -25,6 +25,18 @@ const documentSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
+    aiFileUri:{
+        type:String,
+        default:''
+    },
+    aiFileMimeType:{
+        type:String,
+        default:''
+    },
+    aiFileName:{
+        type:String,
+        default:''
+    },
     extractedText:{
         type:String,
         default:''
@@ -64,6 +76,7 @@ const documentSchema = new mongoose.Schema({
 
 //Index for faster queries
 documentSchema.index({userId:1, uploadDate:-1});
+documentSchema.index({userId:1, lastAccessed:-1});
 
 const Document = mongoose.model('Document', documentSchema);
 
