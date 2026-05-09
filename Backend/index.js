@@ -64,3 +64,7 @@ app.use(errorHandler);
     console.error( `Error: ${err.message}`);
     process.exit(1);
  })
+
+ app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
