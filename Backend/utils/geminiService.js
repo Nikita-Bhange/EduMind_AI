@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import { GoogleGenAI, createPartFromUri } from '@google/genai';
+import fs from 'fs/promises';
+import { GoogleGenAI, createPartFromBase64, createPartFromUri } from '@google/genai';
 
 dotenv.config();
 
@@ -36,6 +37,33 @@ const buildContents = (prompt, source, textLimit = 15000) => {
   return contents;
 };
 
+const stripCodeFence = (text = '') =>
+  text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```$/i, '')
+    .trim();
+
+const parseJsonArray = (text = '') => {
+  const stripped = stripCodeFence(text);
+  try {
+    return JSON.parse(stripped);
+  } catch {
+    const match = stripped.match(/\[[\s\S]*\]/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+};
+
+const normalizeDifficulty = (difficulty = 'medium') => {
+  const value = String(difficulty).toLowerCase();
+  return ['easy', 'medium', 'hard'].includes(value) ? value : 'medium';
+};
+
 export const uploadPdfAndCreatePart = async (filePath, displayName = 'document.pdf') => {
   try {
     const uploadedFile = await ai.files.upload({
@@ -51,13 +79,29 @@ export const uploadPdfAndCreatePart = async (filePath, displayName = 'document.p
       part: createPartFromUri(uploadedFile.uri, uploadedFile.mimeType || 'application/pdf'),
     };
   } catch (error) {
-    console.error('Gemini file upload error:', error);
-    throw new Error('Failed to upload PDF to Gemini');
+    const detail = error?.message || error?.statusText || 'Unknown Gemini upload error';
+    console.error('Gemini file upload error:', detail, error);
+    const uploadError = new Error(`Failed to upload PDF to Gemini: ${detail}`);
+
+    if (
+      detail.includes('PERMISSION_DENIED') ||
+      detail.toLowerCase().includes('api key')
+    ) {
+      uploadError.statusCode = 502;
+      uploadError.message = 'Gemini API key is invalid, expired, or not permitted. Please create a new Gemini API key and update Backend/.env.';
+    }
+
+    throw uploadError;
   }
 };
 
 export const createPartFromStoredUri = (uri, mimeType = 'application/pdf') =>
   createPartFromUri(uri, mimeType);
+
+export const createPartFromLocalPdf = async (filePath) => {
+  const fileBuffer = await fs.readFile(filePath);
+  return createPartFromBase64(fileBuffer.toString('base64'), 'application/pdf');
+};
 
 /**
  * Generate flashcards from text
@@ -66,17 +110,20 @@ export const createPartFromStoredUri = (uri, mimeType = 'application/pdf') =>
  * @returns {Promise<Array<{question: string, answer: string, difficulty: string}>>}
  */
 export const generateFlashcards = async (source, count = 10) => {
-  const prompt = `Generate exactly ${count} educational flashcards strictly from the attached document.
-Do not use outside knowledge.
+  const candidateCount = Math.min(20, Math.max(count + 4, count));
+  const prompt = `Generate ${candidateCount} high-quality educational flashcards strictly from the attached document, then return the best ${count}.
+Do not use outside knowledge. Ignore file names, authors, creation dates, cover pages, page labels, and PDF metadata.
+Prioritize medically/academically important ideas from the body content.
+Cover distinct sections and topics across the document. If anatomy, biochemistry, and physiology are present, include all of them.
+Avoid trivial questions like who created the PDF, what the title is, or how many pages it has.
+Prefer moderate recall, comparison, relationship, function, and application questions.
 If the document does not contain enough readable content, return exactly:
 INSUFFICIENT_CONTENT
 
-Format each flashcard as:
-Q: [Clear, specific question]
-A: [Concise, accurate answer]
-D: [Difficulty level: easy, medium, or hard]
-
-Separate each flashcard with "---"
+Return only valid JSON, no markdown:
+[
+  {"question":"Clear specific question","answer":"Concise accurate answer","difficulty":"medium"}
+]
 `;
 
   try {
@@ -91,31 +138,16 @@ Separate each flashcard with "---"
       return [];
     }
 
-    // Parse the response
-    const flashcards = [];
-    const cards = generatedText.split('---').filter(c => c.trim());
-
-    for (const card of cards) {
-      const lines = card.trim().split('\n');
-      let question = '', answer = '', difficulty = 'medium';
-
-      for (const line of lines) {
-        if (line.startsWith('Q:')) {
-          question = line.substring(2).trim();
-        } else if (line.startsWith('A:')) {
-          answer = line.substring(2).trim();
-        } else if (line.startsWith('D:')) {
-          const diff = line.substring(2).trim().toLowerCase();
-          if (['easy', 'medium', 'hard'].includes(diff)) {
-            difficulty = diff;
-          }
-        }
-      }
-
-      if (question && answer) {
-        flashcards.push({ question, answer, difficulty });
-      }
-    }
+    const parsedCards = parseJsonArray(generatedText);
+    const flashcards = Array.isArray(parsedCards)
+      ? parsedCards
+          .map((card) => ({
+            question: String(card.question || '').trim(),
+            answer: String(card.answer || '').trim(),
+            difficulty: normalizeDifficulty(card.difficulty),
+          }))
+          .filter((card) => card.question && card.answer)
+      : [];
 
     return flashcards.slice(0, count);
   } catch (error) {
@@ -131,23 +163,26 @@ Separate each flashcard with "---"
  * @returns {Promise<Array<{question: string, options: Array, correctAnswer: string, explanation: string, difficulty: string}>>}
  */
 export const generateQuiz = async (source, numQuestions = 5) => {
-  const prompt = `Generate exactly ${numQuestions} multiple choice questions strictly from the attached document.
-Do not use outside knowledge.
+  const candidateCount = Math.min(15, Math.max(numQuestions + 3, numQuestions));
+  const prompt = `Generate ${candidateCount} multiple choice question candidates strictly from the attached document, then return the best ${numQuestions}.
+Do not use outside knowledge. Ignore file names, authors, creation dates, cover pages, page labels, and PDF metadata.
+Cover distinct sections and topics across the document. If anatomy, biochemistry, and physiology are present, include questions from all sections.
+Target mostly medium difficulty. Avoid very easy definition-only questions unless needed for balance.
+Prefer application, comparison, cause-effect, structure-function, and clinical/academic reasoning questions.
+Each question must test actual body content from the document, not document properties.
 If the document does not contain enough readable content, return exactly:
 INSUFFICIENT_CONTENT
 
-Format each question as:
-
-Q: [Question]
-O1: [Option 1]
-O2: [Option 2]
-O3: [Option 3]
-O4: [Option 4]
-C: [Correct option - exactly as written above]
-E: [Brief explanation]
-D: [Difficulty: easy, medium, or hard]
-
-Separate questions with "---"
+Return only valid JSON, no markdown:
+[
+  {
+    "question":"Question text",
+    "options":["Option A","Option B","Option C","Option D"],
+    "correctAnswer":"Exact option text",
+    "explanation":"Brief explanation grounded in the document",
+    "difficulty":"medium"
+  }
+]
 `;
 
   try {
@@ -162,52 +197,37 @@ Separate questions with "---"
       return [];
     }
 
-    const questions = [];
-    const questionBlocks = generatedText.split('---').filter(q => q.trim());
+    const parsedQuestions = parseJsonArray(generatedText);
+    const questions = Array.isArray(parsedQuestions)
+      ? parsedQuestions
+          .map((item) => {
+            const options = Array.isArray(item.options)
+              ? item.options.map((option) => String(option || '').trim()).filter(Boolean).slice(0, 4)
+              : [];
+            let correctAnswer = String(item.correctAnswer || '').trim();
+            const optionIndexMatch = correctAnswer.match(/^O([1-4])$/i);
+            if (optionIndexMatch) {
+              correctAnswer = options[Number(optionIndexMatch[1]) - 1] || correctAnswer;
+            }
 
-    for (const block of questionBlocks) {
-      const lines = block.trim().split('\n');
-
-      let question = '';
-      let options = [];
-      let correctAnswer = '';
-      let explanation = '';
-      let difficulty = 'medium';
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-
-        if (trimmed.startsWith('Q:')) {
-          question = trimmed.substring(2).trim();
-        } else if (trimmed.match(/^O\d:/)) {
-          options.push(trimmed.substring(3).trim());
-        } else if (trimmed.startsWith('C:')) {
-          correctAnswer = trimmed.substring(2).trim();
-        } else if (trimmed.startsWith('E:')) {
-          explanation = trimmed.substring(2).trim();
-        } else if (trimmed.startsWith('D:')) {
-          const diff = trimmed.substring(2).trim().toLowerCase();
-          if (['easy', 'medium', 'hard'].includes(diff)) {
-            difficulty = diff;
-          }
-        }
-      }
-
-      if (question && options.length === 4 && correctAnswer) {
-        questions.push({
-          question,
-          options,
-          correctAnswer,
-          explanation,
-          difficulty
-        });
-      }
-    }
+            return {
+              question: String(item.question || '').trim(),
+              options,
+              correctAnswer,
+              explanation: String(item.explanation || '').trim(),
+              difficulty: normalizeDifficulty(item.difficulty),
+            };
+          })
+          .filter((item) => item.question && item.options.length === 4 && item.correctAnswer)
+      : [];
 
     return questions.slice(0, numQuestions);
   } catch (error) {
-    console.error('Gemini API error:', error);
-    throw new Error('Failed to generate quiz');
+    const detail = error?.message || 'Unknown Gemini quiz error';
+    console.error('Gemini quiz error:', detail, error);
+    const quizError = new Error(`Failed to generate quiz: ${detail}`);
+    quizError.statusCode = error?.statusCode || error?.status || 500;
+    throw quizError;
   }
 };
 

@@ -94,7 +94,7 @@ const ChatInterface = () => {
           </div>
         )}
 
-        <div className={`max-w-lg p-4  rounded-2xl shadow-sm ${isUser ? 'bg-linear-to-br from-emerald-500 to-teal-500 text-white' : 'bg-white border border-slate-200/60'}`}>
+        <div className={`max-w-lg p-4  rounded-2xl shadow-sm ${isUser ? 'bg-linear-to-br from-emerald-500 to-teal-500 text-white dark:from-[#FF3CAC] dark:to-[#784BA0]' : 'bg-white dark:bg-[#151515] border border-slate-200/60 dark:border-[#2f2f2f]'}`}>
         {isUser ? (
           <p>{msg.content}</p>  
 
@@ -115,14 +115,14 @@ const ChatInterface = () => {
 
   if (initialLoading) {
     return (
-      <div className="flex flex-col h-[70vh] bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl items-center justify-center shadow-xl shadow-slate-200">
-        <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
-          <MessageSquare className="w-7 h-7 text-emerald-600" strokeWidth={2} />
+      <div className="flex flex-col h-[70vh] bg-white/80 dark:bg-[#151515]/95 backdrop-blur-xl border border-slate-200/60 dark:border-[#2f2f2f] rounded-2xl items-center justify-center shadow-xl shadow-slate-200 dark:shadow-[#7A00FF]/20">
+        <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 dark:from-[#2a1830] dark:to-[#1f1a33] flex items-center justify-center mb-4">
+          <MessageSquare className="w-7 h-7 text-emerald-600 dark:text-[#ff8bcb]" strokeWidth={2} />
         </div>
 
         <Spinner />
 
-        <p className="text-sm text-slate-500 mt-3 font-medium">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 font-medium">
           Loading chat history...
         </p>
       </div>
@@ -130,23 +130,23 @@ const ChatInterface = () => {
   }
 
   return (
-    <div className="flex flex-col h-[70vh] bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200 overflow-hidden">
+    <div className="flex flex-col h-[70vh] bg-white/80 dark:bg-[#151515]/95 backdrop-blur-xl border border-slate-200/60 dark:border-[#2f2f2f] rounded-2xl shadow-xl shadow-slate-200 dark:shadow-[#7A00FF]/20 overflow-hidden">
       
       {/* Messages Area */}
-      <div className="flex-1 p-6 overflow-y-auto bg-linear-to-br from-slate-50/50 via-white/50 to-slate-100">
+      <div className="flex-1 p-6 overflow-y-auto bg-linear-to-br from-slate-50/50 via-white/50 to-slate-100 dark:from-[#101010] dark:via-[#151515] dark:to-[#1c1c1c]">
         
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4 shadow-lg shadow-emerald-300">
-              <MessageSquare className="w-8 h-8 text-emerald-600" strokeWidth={2} />
+            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 dark:from-[#2a1830] dark:to-[#1f1a33] flex items-center justify-center mb-4 shadow-lg shadow-emerald-300 dark:shadow-[#7A00FF]/25">
+              <MessageSquare className="w-8 h-8 text-emerald-600 dark:text-[#ff8bcb]" strokeWidth={2} />
             </div>
 
-            <h3 className="text-base font-semibold text-slate-900 mb-2">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-2">
               Start a conversation
             </h3>
 
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Ask me anything about the document!
             </p>
           </div>
@@ -165,7 +165,7 @@ const ChatInterface = () => {
               <Sparkles className="w-4 h-4 text-white" strokeWidth={2} />
             </div>
 
-            <div className="flex items-center gap-2 px-4 py-3 rounded-2xl rounded-bl-md bg-white border border-slate-200/10 shadow-sm">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-2xl rounded-bl-md bg-white dark:bg-[#151515] border border-slate-200/10 dark:border-[#2f2f2f] shadow-sm">
             <div className="flex gap-1">
               <span className='w-2 h-2 bg-slate-400 rounded-full animate-bounce' style={{ animationDelay: "0ms" }}></span>
               <span className='w-2 h-2 bg-slate-400 rounded-full animate-bounce' style={{ animationDelay: "150ms" }}></span>
@@ -179,7 +179,7 @@ const ChatInterface = () => {
       {/* Input Area */}
       <div>
         {/* Input components go here */}
-        <div className="p-4 border-t border-slate-200/60 bg-white/80">
+        <div className="p-4 border-t border-slate-200/60 dark:border-[#2f2f2f] bg-white/80 dark:bg-[#151515]">
           <form onSubmit={handleSendMessage} className="flex items-center gap-3 ">
             <input
               type="text"
@@ -187,7 +187,7 @@ const ChatInterface = () => {
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Ask me follow-up questions..."
               disabled={loading}
-              className="flex-1 px-4 py-2 rounded-2xl bg-white border border-slate-200/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent"
+              className="flex-1 px-4 py-2 rounded-2xl bg-white dark:bg-white text-black placeholder-slate-400 border border-slate-200/60 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent"
             />
             <button
               type="submit"

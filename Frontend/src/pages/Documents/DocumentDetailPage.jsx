@@ -56,27 +56,27 @@ const DocumentDetailPage = () => {
                 }
 
                 if (!document || !document.data || !document.data.filePath) {
-                  return <div className="">PDF not available.</div>;
+                  return <div className="text-slate-700 dark:text-slate-300">PDF not available.</div>;
                 }
 
                   const pdfUrl = getPdfUrl();
                 return (
                 
-                <div  className="bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
-                <div className="flex items-center justify-between p-4 bg-gray-50 border-b border-gray-300">
-                  <span className="text-sm font-medium text-gray-700">Document Viewer</span>
+                <div  className="bg-white dark:bg-[#151515] border border-gray-300 dark:border-[#2f2f2f] rounded-lg overflow-hidden shadow-sm dark:shadow-[#7A00FF]/10">
+                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1c1c1c] border-b border-gray-300 dark:border-[#2f2f2f]">
+                  <span className="text-sm font-medium text-gray-700 dark:text-slate-200">Document Viewer</span>
                   <a
                     href={pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700"
+                    className="inline-flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-700 dark:text-[#ff8bcb] dark:hover:text-[#ffb3dc]"
                   >
                     <ExternalLink size={16} />
                     Open in new tab
                   </a>
                 </div>
 
-                <div className="bg-gray-100 p-1">
+                <div className="bg-gray-100 dark:bg-[#101010] p-1">
                   <iframe
                     src={pdfUrl}
                     className="w-full h-[70vh] bg-white rounded"
@@ -127,7 +127,7 @@ const DocumentDetailPage = () => {
         return (
           <div>
             <div className="mb-4">
-              <Link to="/documents" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 mb-4">
+              <Link to="/documents" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-100 mb-4">
                 <ArrowLeft size={16} />
                 Back to Documents
               </Link>

@@ -5,7 +5,7 @@ import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const MarkdownRenderer = ({ content }) => {
   return (
-    <div className="text-neutral-700">
+    <div className="text-neutral-700 dark:text-slate-200">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -65,7 +65,7 @@ const MarkdownRenderer = ({ content }) => {
               </SyntaxHighlighter>
             ) : (
               <code
-                className="bg-neutral-100 p-1 rounded font-mono text-sm"
+                className="bg-neutral-100 dark:bg-[#242424] p-1 rounded font-mono text-sm"
                 {...props}
               >
                 {children}

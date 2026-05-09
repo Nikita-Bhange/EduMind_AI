@@ -148,11 +148,11 @@ const FlashcardManager = ({ documentId }) => {
   const currentCard = selectedSet?.cards?.[currentCardIndex];
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-lg p-6 space-y-6">
+    <div className="bg-white dark:bg-[#151515] border border-neutral-200 dark:border-[#2f2f2f] rounded-lg p-6 space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-neutral-900">Flashcards</h3>
-          <p className="text-sm text-neutral-500">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-slate-100">Flashcards</h3>
+          <p className="text-sm text-neutral-500 dark:text-slate-400">
             {selectedSet?.cards?.length || 0} cards in this set
           </p>
         </div>
@@ -178,10 +178,10 @@ const FlashcardManager = ({ documentId }) => {
                 setSelectedSet(set);
                 setCurrentCardIndex(0);
               }}
-              className="rounded-lg border border-neutral-200 p-4 text-left hover:border-neutral-300 transition-colors"
+              className="rounded-lg border border-neutral-200 dark:border-[#2f2f2f] p-4 text-left hover:border-emerald-300 dark:hover:border-[#784BA0] transition-colors"
             >
-              <div className="text-sm font-semibold text-neutral-900">Flashcard Set</div>
-              <div className="text-sm text-neutral-500 mt-1">{set.cards.length} cards</div>
+              <div className="text-sm font-semibold text-neutral-900 dark:text-slate-100">Flashcard Set</div>
+              <div className="text-sm text-neutral-500 dark:text-slate-400 mt-1">{set.cards.length} cards</div>
             </button>
           ))}
         </div>
@@ -196,7 +196,7 @@ const FlashcardManager = ({ documentId }) => {
                 setSelectedSet(null);
                 setCurrentCardIndex(0);
               }}
-              className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
+              className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-slate-100"
             >
               <ArrowLeft size={16} />
               Back to Sets
@@ -212,7 +212,7 @@ const FlashcardManager = ({ documentId }) => {
               <ChevronLeft size={16} />
               Previous
             </Button>
-            <span className="text-sm text-neutral-600">
+            <span className="text-sm text-neutral-600 dark:text-slate-400">
               {currentCardIndex + 1} / {selectedSet.cards.length}
             </span>
             <Button onClick={handleNextCard} variant="secondary" disabled={selectedSet.cards.length <= 1}>

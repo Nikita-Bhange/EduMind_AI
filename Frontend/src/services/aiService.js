@@ -87,6 +87,15 @@ const getChatHistory = async (documentId) => {
   }
 };
 
+const getActionHistory = async (documentId) => {
+  try {
+    const response = await axiosInstance.get(API_PATHS.AI.GET_ACTION_HISTORY(documentId));
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'failed to fetch AI history' };
+  }
+};
+
 const aiService ={
     generateFlashcards,
     generateQuiz,
@@ -94,6 +103,7 @@ const aiService ={
     chat,
     explainConcept,
     getChatHistory,
+    getActionHistory,
 }
 
 export default aiService;

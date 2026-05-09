@@ -3,15 +3,15 @@ import React from 'react'
 const Tabs = ({tabs,activeTab, setActiveTab}) => {
   return (
     <div className="w-full">
-      <div className="relative border-b-2 border-slate-100 ">
-        <nav className="flex gap-2">
+      <div className="relative border-b-2 border-slate-100 dark:border-[#2a2a2a]">
+        <nav className="flex gap-2 overflow-x-auto pb-1">
           {tabs.map((tab) => (
             <button
               key={tab.name}
               className={`relative pb-4 md:px-6 px-2 py-2 text-sm font-medium transition-all duration-200 rounded-md ${
                 activeTab === tab.name
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-200'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 dark:bg-[#784BA0] dark:shadow-[#7A00FF]/30'
+                  : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 dark:text-slate-300 dark:hover:bg-[#1c1c1c] dark:hover:text-[#ff8bcb]'
               }`}
               onClick={() => setActiveTab && setActiveTab(tab.name)}
             >
@@ -19,13 +19,7 @@ const Tabs = ({tabs,activeTab, setActiveTab}) => {
               {tab.label}
               </span>
               {activeTab === tab.name && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"/>
-
-                    )}
-                     {activeTab === tab.name && (
-                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"/>
-
-
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 dark:bg-[#FF3CAC]"/>
                     )}
             </button>
           ))}

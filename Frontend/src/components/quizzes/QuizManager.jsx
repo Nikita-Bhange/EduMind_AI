@@ -77,7 +77,7 @@ const QuizManager = ({ documentId }) => {
   };
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-lg p-6 space-y-6">
+    <div className="bg-white dark:bg-[#151515] border border-neutral-200 dark:border-[#2f2f2f] rounded-lg p-6 space-y-6">
       <div className="flex justify-end">
         <Button onClick={() => setIsGenerateModalOpen(true)}>
           <Plus size={16} />
@@ -107,7 +107,7 @@ const QuizManager = ({ documentId }) => {
       >
         <form onSubmit={handleGenerateQuiz} className="space-y-4">
           <div>
-            <label className="block text-sm text-neutral-700 mb-2">Number of Questions</label>
+            <label className="block text-sm text-neutral-700 dark:text-slate-300 mb-2">Number of Questions</label>
             <input
               type="number"
               value={numQuestions}
@@ -117,9 +117,9 @@ const QuizManager = ({ documentId }) => {
               }}
               min="1"
               max="10"
-              className="w-full h-10 px-3 border border-neutral-200 rounded-lg"
+              className="w-full h-10 px-3 border border-neutral-200 dark:border-[#2f2f2f] rounded-lg bg-white dark:bg-[#1c1c1c] text-neutral-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-[#7A00FF]/50"
             />
-            <p className="mt-1 text-xs text-neutral-500">Maximum 10 questions per quiz.</p>
+            <p className="mt-1 text-xs text-neutral-500 dark:text-slate-400">Maximum 10 questions per quiz.</p>
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="secondary" onClick={() => setIsGenerateModalOpen(false)} disabled={generating}>
@@ -138,7 +138,7 @@ const QuizManager = ({ documentId }) => {
         title="Delete Quiz"
       >
         <div className="space-y-4">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-neutral-600 dark:text-slate-400">
             Are you sure you want to delete {selectedQuiz?.title || "this quiz"}? This action cannot be undone.
           </p>
           <div className="flex justify-end gap-2">

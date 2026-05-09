@@ -18,7 +18,7 @@ const FlashcardSetCard = ({ flashcardSet, onDelete }) => {
   return (
     <>
     <div
-      className="group relative bg-white/80 backdrop-blur-xl border-2 border-slate-200 hover:border-emerald-300 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10 fle flex-col justify-between"
+      className="group relative bg-white/80 dark:bg-[#151515]/95 backdrop-blur-xl border-2 border-slate-200 dark:border-[#2f2f2f] hover:border-emerald-300 dark:hover:border-[#784BA0] rounded-xl p-5 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10 dark:hover:shadow-[#7A00FF]/20 fle flex-col justify-between"
       onClick={handleStudyNow}
     >
       {typeof onDelete === "function" && (
@@ -28,7 +28,7 @@ const FlashcardSetCard = ({ flashcardSet, onDelete }) => {
             e.stopPropagation();
             onDelete(flashcardSet);
           }}
-          className="absolute top-3 right-3 p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+          className="absolute top-3 right-3 p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
           aria-label="Delete flashcard set"
           title="Delete flashcard set"
         >
@@ -38,19 +38,19 @@ const FlashcardSetCard = ({ flashcardSet, onDelete }) => {
         <div className="space-y-4">
       {/* Icon and Title */}
       <div className="flex items-start gap-4">
-        <div className="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center">
-          <BookOpen className="w-6 h-6 text-emerald-600" strokeWidth={2} />
+        <div className="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-[#2a1830] dark:to-[#1f1a33] flex items-center justify-center">
+          <BookOpen className="w-6 h-6 text-emerald-600 dark:text-[#ff8bcb]" strokeWidth={2} />
         </div>
 
         <div className="flex-1 min-w-0">
           <h3
-            className="text-base font-semibold text-slate-900 line-clamp-2 mb-1"
+            className="text-base font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 mb-1"
             title={flashcardSet?.documentId?.title}
           >
             {flashcardSet?.documentId?.title}
           </h3>
 
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
             Created {moment(flashcardSet.createdAt).fromNow()}
           </p>
         </div>
@@ -58,16 +58,16 @@ const FlashcardSetCard = ({ flashcardSet, onDelete }) => {
 
       {/* Stats */}
       <div className="flex items-center gap-3 pt-3">
-        <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
-          <span className="text-xs font-semibold text-slate-700">
+        <div className="px-3 py-1.5 bg-slate-50 dark:bg-[#1c1c1c] border border-slate-200 dark:border-[#2f2f2f] rounded-lg">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
             {totalCards} {totalCards === 1 ? "card" : "cards"}
           </span>
         </div>
 
         {reviewedCount > 0 && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" strokeWidth={2.5}/>
-            <span className="text-sm font-semibold text-emerald-700">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-[#2a1830] border border-emerald-200 dark:border-[#784BA0]/50 rounded-lg">
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-[#ff8bcb]" strokeWidth={2.5}/>
+            <span className="text-sm font-semibold text-emerald-700 dark:text-[#ffb3dc]">
               {progressPercentage}%
             </span>
           </div>
@@ -78,28 +78,28 @@ const FlashcardSetCard = ({ flashcardSet, onDelete }) => {
       {totalCards > 0 && (
         <div className="space-y-2 ">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-600">
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
               Progress
             </span>
-            <span className="text-xs font-semibold text-slate-700">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               {reviewedCount}/{totalCards} reviewed
             </span>
           </div>
-          <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div className="absolute inset-y-0 bg-linear-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-300" style={{width:`${progressPercentage}%`}}/>
+          <div className="relative h-2 bg-slate-100 dark:bg-[#242424] rounded-full overflow-hidden">
+            <div className="absolute inset-y-0 bg-linear-to-r from-emerald-500 to-teal-500 dark:from-[#FF3CAC] dark:to-[#784BA0] rounded-full transition-all duration-300" style={{width:`${progressPercentage}%`}}/>
           </div>
         </div>
       )}
 </div>
 
       {/* Study Button */}
-      <div className="mt-6 pt-4 border-t border-slate-100">
+      <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#2a2a2a]">
         <button
           onClick={(e) => {
             e.stopPropagation();
             handleStudyNow();
           }}
-          className="group/btn relative w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500  hover:from-emerald-600 hover:to-teal-600 text-emerald-700 hover:text-white font-semibold text-sm rounded-xl transition-all duration-200 active:scale-95 overflow-hidden"
+          className="group/btn relative w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 dark:from-[#FF3CAC] dark:to-[#784BA0] dark:hover:from-[#ff57b8] dark:hover:to-[#8a57b2] text-white font-semibold text-sm rounded-xl transition-all duration-200 active:scale-95 overflow-hidden"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4" strokeWidth={2.5} />

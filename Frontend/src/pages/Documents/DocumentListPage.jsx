@@ -103,11 +103,11 @@ const DocumentListPage = () => {
       return (
         <div className="flex items-center justify-center min-h-[20rem]">
           <div className="text-center max-w-md">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-slate-100 mb-4">
-              <FileText className="w-10 h-10 text-slate-400" strokeWidth={1.5} />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-slate-100 dark:bg-[#1c1c1c] mb-4">
+              <FileText className="w-10 h-10 text-slate-400 dark:text-slate-500" strokeWidth={1.5} />
             </div>
-            <h3 className="text-xl font-medium text-slate-900 tracking-tight mb-2">No Document Yet</h3>
-            <p className="text-sm text-slate-500 mb-6">Get started by uploading your first PDF document to begin learning.</p>
+            <h3 className="text-xl font-medium text-slate-900 dark:text-slate-100 tracking-tight mb-2">No Document Yet</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Get started by uploading your first PDF document to begin learning.</p>
             <Button onClick={() => setIsUploadModalOpen(true)}>
               <Plus className="w-4 h-4" strokeWidth={2.5} />
               Upload Document
@@ -128,13 +128,13 @@ const DocumentListPage = () => {
 
   return (
     <div className="min-h-screen relative">
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] opacity-30 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#262626_1px,transparent_1px)] bg-size-[16px_16px] opacity-30 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-2xl font-medium text-slate-900 tracking-tight mb-2">My Documents</h1>
-            <p className="text-slate-500 text-sm">Manage and organize your learning materials</p>
+            <h1 className="text-2xl font-medium text-slate-900 dark:text-slate-100 tracking-tight mb-2">My Documents</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Manage and organize your learning materials</p>
           </div>
           <Button onClick={() => setIsUploadModalOpen(true)}>
             <Plus className="w-4 h-4" strokeWidth={2.5} />
@@ -145,52 +145,52 @@ const DocumentListPage = () => {
         {renderContent()}
       </div>
       {isUploadModalOpen && (
-        <div className="fixed  inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm ">
-          <div className="p-8 relative w-full max-w-lg bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-2xl shadow-slate-500">
-            <button onClick={() => setIsUploadModalOpen(false)} className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200">
+        <div className="fixed  inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-black/70 backdrop-blur-sm ">
+          <div className="p-8 relative w-full max-w-lg bg-white/95 dark:bg-[#151515]/95 backdrop-blur-xl border border-slate-200/60 dark:border-[#2f2f2f] rounded-2xl shadow-2xl shadow-slate-500/30 dark:shadow-[#7A00FF]/20">
+            <button onClick={() => setIsUploadModalOpen(false)} className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-100 dark:hover:bg-[#242424] transition-all duration-200">
               <X className='w-5 h-5' strokeWidth={2} />
             </button>
             <div className="mb-6">
-              <h2 className="text-xl font-medium text-slate-900 tracking-tight">Upload New Document</h2>
-              <p className='text-sm text-slate-500 mt-1'>add a pdf doc to ur library</p>
+              <h2 className="text-xl font-medium text-slate-900 dark:text-slate-100 tracking-tight">Upload New Document</h2>
+              <p className='text-sm text-slate-500 dark:text-slate-400 mt-1'>add a pdf doc to ur library</p>
             </div>
 
             <form onSubmit={handleUpload} className='space-y-5'>
               <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide">Notes Title</label>
-                <input type="text" value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)} required className="w-full h-12 px-4 border-2 border-slate-200 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white  focus:shadow-lg focus:shadow-emerald-300" placeholder='e.g. ' />
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Notes Title</label>
+                <input type="text" value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)} required className="w-full h-12 px-4 border-2 border-slate-200 dark:border-[#2f2f2f] rounded-xl bg-slate-50/50 dark:bg-[#1c1c1c] text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 dark:focus:border-[#FF3CAC] focus:bg-white dark:focus:bg-[#202020] focus:shadow-lg focus:shadow-emerald-300/50 dark:focus:shadow-[#7A00FF]/30" placeholder='e.g. ' />
               </div>
 
               <div className='space-y-2'>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking">PDF File</label>
-                <div className="relative border-2 border-dashed bg-slate-50/50 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking">PDF File</label>
+                <div className="relative border-2 border-dashed border-slate-200 dark:border-[#2f2f2f] bg-slate-50/50 dark:bg-[#1c1c1c] hover:border-emerald-400 dark:hover:border-[#FF3CAC] hover:bg-emerald-50/30 dark:hover:bg-[#22172a] transition-all">
                   <input type="file" id="file-upload" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 " onChange={handleFileChange} accept=".pdf" />
                   <div className="flex flex-col items-center justify-center py-10 px-6">
-                    <div className="w-14 h-14 rounded-xl bg-linear-to-r from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
-                      <Upload className="w-7 h-7 text-emerald-600" strokeWidth={2} />
+                    <div className="w-14 h-14 rounded-xl bg-linear-to-r from-emerald-100 to-teal-100 dark:from-[#2a1830] dark:to-[#1f1a33] flex items-center justify-center mb-4">
+                      <Upload className="w-7 h-7 text-emerald-600 dark:text-[#ff8bcb]" strokeWidth={2} />
 
                     </div>
-                    <p className="text-sm font-medium text-slate-700 mb-1">{uploadFile ? (
-                      <span className="text-emerald-600">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{uploadFile ? (
+                      <span className="text-emerald-600 dark:text-[#ff8bcb]">
                         {uploadFile.name}
                       </span>
                     ) : (
                       <>
-                        <span className='text-emerald-600'>click to upload</span> {" "}
+                        <span className='text-emerald-600 dark:text-[#ff8bcb]'>click to upload</span> {" "}
                         or drag and drop
                       </>
                     )}
                     </p>
-                    <p className="text-xs text-slate-500">PDF up to 10mb</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">PDF up to 10mb</p>
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button className="flex-1 h-11 border-2 border-slate-200 rounded-xl bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled: opacity-50 disabled:cursor-not-allowed" type='button' onClick={() => setIsUploadModalOpen(false)} disabled={uploading}>
+                <button className="flex-1 h-11 border-2 border-slate-200 dark:border-[#2f2f2f] rounded-xl bg-white dark:bg-[#1c1c1c] text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-[#242424] hover:border-slate-300 dark:hover:border-[#3a3a3a] transition-all duration-200 disabled: opacity-50 disabled:cursor-not-allowed" type='button' onClick={() => setIsUploadModalOpen(false)} disabled={uploading}>
                   cancel
                 </button>
-                <button type='submit' disabled={uploading} className='flex-1 h-11 px-4 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 disabled: opacity-50 disabled:cursor-not-allowed active:scale-[0.98]'>
+                <button type='submit' disabled={uploading} className='flex-1 h-11 px-4 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 dark:from-[#FF3CAC] dark:to-[#784BA0] dark:hover:from-[#ff57b8] dark:hover:to-[#8a57b2] text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 dark:shadow-[#7A00FF]/30 disabled: opacity-50 disabled:cursor-not-allowed active:scale-[0.98]'>
                   {uploading ? (
                     <span className="flex items-center justify-center gap-2">
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

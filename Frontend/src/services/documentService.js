@@ -2,13 +2,23 @@
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS  } from "../utils/apiPaths";
 
+const getRequestError = (error, fallbackMessage) => {
+  if (error.response?.data) return error.response.data;
+
+  if (error.code === "ECONNABORTED") {
+    return { message: "Request timed out. Please check whether the backend and database are responding." };
+  }
+
+  return { message: error.message || fallbackMessage };
+};
+
 const getDocuments=  async()=>{
   try{
     const response = await axiosInstance.get(API_PATHS.DOCUMENTS.GET_DOCUMENTS)
 
     return response.data.data;
   }catch(error){
-    throw error.response?.data || {message: 'failed to fetch documents'}
+    throw getRequestError(error, 'failed to fetch documents')
   }
 }
 
@@ -24,7 +34,7 @@ const uploadDocument=  async(formData)=>{
 
     return response.data;
   }catch(error){
-    throw error.response?.data || {message: 'failed to upload document'}
+    throw getRequestError(error, 'failed to upload document')
   }
 }
 
@@ -35,7 +45,7 @@ const deleteDocuments=  async(id)=>{
 
     return response.data;
   }catch(error){
-    throw error.response?.data || {message: 'failed to delete documents'}
+    throw getRequestError(error, 'failed to delete documents')
   }
 }
 
@@ -46,7 +56,7 @@ const getDocumentById=  async(id)=>{
 
     return response.data;
   }catch(error){
-    throw error.response?.data || {message: 'failed to fetch document'}
+    throw getRequestError(error, 'failed to fetch document')
   }
 }
 

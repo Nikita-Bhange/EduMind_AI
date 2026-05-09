@@ -132,11 +132,13 @@ export const getDocument = async (req, res, next)=>{
             Quiz.countDocuments({documentId:document._id,userId:req.user._id})
         ]);
 
-        //update last accessed without loading heavy document content
-        await Document.updateOne(
+        // Update last accessed in the background so the page can render without waiting on this write.
+        Document.updateOne(
             { _id: document._id, userId: req.user._id },
             { $set: { lastAccessed: new Date() } }
-        );
+        ).catch((error) => {
+            console.error('Failed to update document lastAccessed:', error);
+        });
 
         //combine documnt data with counts
         const documentData = {...document};

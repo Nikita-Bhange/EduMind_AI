@@ -2,8 +2,10 @@ import Document from "../models/Document.js";
 import Flashcard from "../models/Flashcard.js";
 import Quiz from "../models/Quiz.js";
 import ChatHistory from "../models/ChatHistory.js";
+import AiActionHistory from "../models/AiActionHistory.js";
 import * as geminiService from "../utils/geminiService.js";
-import { findRelevantChunks } from "../utils/textChunker.js";
+import { extractTextFromPDF } from "../utils/pdfParser.js";
+import { chunkText, findRelevantChunks } from "../utils/textChunker.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -22,6 +24,17 @@ const hasMeaningfulExtractedText = (text = "") => {
   return normalized.length >= 120 && /[a-zA-Z]{3,}/.test(normalized);
 };
 
+const hasReadableExtractedText = (text = "") => {
+  const normalized = normalizeText(text);
+  return normalized.length >= 20 && /[a-zA-Z]{3,}/.test(normalized);
+};
+
+const createHttpError = (message, statusCode = 500) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
 const getLocalDocumentPath = (document) => {
   let fileName;
 
@@ -36,13 +49,34 @@ const getLocalDocumentPath = (document) => {
 
 const getDocumentAiSource = async (document) => {
   let pdfPart = null;
+  let extractedText = hasReadableExtractedText(document.extractedText) ? normalizeText(document.extractedText) : "";
 
-  if (document.aiFileUri && document.aiFileMimeType) {
+  if (!extractedText) {
+    const localPath = getLocalDocumentPath(document);
+
+    try {
+      const parsedPdf = await extractTextFromPDF(localPath);
+      extractedText = hasReadableExtractedText(parsedPdf.text) ? normalizeText(parsedPdf.text) : "";
+
+      if (extractedText) {
+        document.extractedText = parsedPdf.text;
+        document.chunks = chunkText(parsedPdf.text, 500, 50);
+        document.status = "ready";
+        await document.save();
+      }
+    } catch (error) {
+      console.error(`Failed to re-parse PDF for document ${document._id}:`, error);
+    }
+  }
+
+  const localPath = getLocalDocumentPath(document);
+  const allowGeminiFileUpload = process.env.USE_GEMINI_FILE_UPLOAD === "true";
+
+  if (allowGeminiFileUpload && !extractedText && document.aiFileUri && document.aiFileMimeType) {
     pdfPart = geminiService.createPartFromStoredUri?.(document.aiFileUri, document.aiFileMimeType);
   }
 
-  if (!pdfPart) {
-    const localPath = getLocalDocumentPath(document);
+  if (allowGeminiFileUpload && !pdfPart && !extractedText) {
     const { file, part } = await geminiService.uploadPdfAndCreatePart(localPath, document.fileName);
     document.aiFileUri = file.uri || "";
     document.aiFileMimeType = file.mimeType || "application/pdf";
@@ -51,7 +85,16 @@ const getDocumentAiSource = async (document) => {
     pdfPart = part;
   }
 
-  const extractedText = hasMeaningfulExtractedText(document.extractedText) ? normalizeText(document.extractedText) : "";
+  if (!pdfPart && !extractedText) {
+    pdfPart = await geminiService.createPartFromLocalPdf(localPath);
+  }
+
+  if (!pdfPart && !extractedText) {
+    throw createHttpError(
+      "This PDF does not contain enough readable text and could not be sent to Gemini for visual reading.",
+      400
+    );
+  }
 
   return {
     pdfPart,
@@ -185,6 +228,13 @@ export const generateSummary = async (req, res, next) => {
 
     const aiSource = await getDocumentAiSource(document);
     const summary = await geminiService.generateSummary(aiSource);
+    await AiActionHistory.create({
+      userId: req.user._id,
+      documentId: document._id,
+      type: "summary",
+      title: "Generated Summary",
+      content: summary,
+    });
 
     return res.status(200).json({
       success: true,
@@ -220,7 +270,7 @@ export const chat = async (req, res, next) => {
     }
 
     const aiSource = await getDocumentAiSource(document);
-    const chunks = hasMeaningfulExtractedText(document.extractedText)
+    const chunks = hasReadableExtractedText(document.extractedText)
       ? await findRelevantChunks(document.chunks || [], question, 3)
       : [];
     const chunkIndices = chunks.map(c => c.chunkIndex);
@@ -292,12 +342,20 @@ export const explainConcept = async (req, res, next) => {
     }
 
     const aiSource = await getDocumentAiSource(document);
-    const relevantChunks = hasMeaningfulExtractedText(document.extractedText)
+    const relevantChunks = hasReadableExtractedText(document.extractedText)
       ? await findRelevantChunks(document.chunks || [], concept, 3)
       : [];
     const context = relevantChunks.map(c => c.content).join('\n\n');
 
     const explanation = await geminiService.explainConcept(concept, context, aiSource);
+    await AiActionHistory.create({
+      userId: req.user._id,
+      documentId: document._id,
+      type: "explanation",
+      title: `Explanation of "${concept.trim()}"`,
+      prompt: concept.trim(),
+      content: explanation,
+    });
 
     return res.status(200).json({
       success: true,
@@ -310,6 +368,33 @@ export const explainConcept = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error in explainConcept:', error);
+    next(error);
+  }
+};
+
+export const getActionHistory = async (req, res, next) => {
+  try {
+    const { documentId } = req.params;
+
+    if (!documentId) {
+      return res.status(400).json({ success: false, error: 'Document ID is required', statusCode: 400 });
+    }
+
+    const history = await AiActionHistory.find({
+      userId: req.user._id,
+      documentId,
+    })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      data: history,
+      message: 'AI action history retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Error in getActionHistory:', error);
     next(error);
   }
 };

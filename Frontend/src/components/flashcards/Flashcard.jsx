@@ -20,7 +20,7 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
       >
         {/* Front of the card (Question) */}
         <div
-          className="absolute inset-0 w-full h-full bg-white/80 backdrop-blur-xl border-2 border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/50 p-8 flex flex-col justify-between "
+          className="absolute inset-0 w-full h-full bg-white/80 dark:bg-[#151515]/95 backdrop-blur-xl border-2 border-slate-200/60 dark:border-[#2f2f2f] rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-[#7A00FF]/20 p-8 flex flex-col justify-between "
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
@@ -36,7 +36,7 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
                 flashcard.isStarred
                   ? "bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-lg"
-                  : "bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-amber-400"
+                  : "bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-amber-400 dark:bg-[#1c1c1c] dark:text-slate-500 dark:hover:bg-[#242424]"
               }`}
             >
               <Star
@@ -49,20 +49,20 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
 
           {/* Question Content */}
           <div className="flex-1 flex items-center justify-center px-4 py-6">
-            <p className="text-lg font-semibold text-slate-900 text-center">
+            <p className="text-lg font-semibold text-slate-900 dark:text-slate-100 text-center">
               {flashcard.question}
             </p>
           </div>
         </div>
 
               {/* flip indicator */}
-              <div className="flex items-center justify-center gap-2 text-xs text-slate-400 font-medium">
+              <div className="flex items-center justify-center gap-2 text-xs text-slate-400 dark:text-slate-500 font-medium">
                 <RotateCcw className="w-3.5 h-3.5" strokeWidth={2}/>
                 <span>click to reveal answer</span>
               </div>
         {/* Back of the card (Answer) */}
         <div
-          className="absolute inset-0 w-full h-full bg-linear-to-br from-emerald-500 to-teal-500 border-2 border-emerald-200/60  rounded-2xl shadow-xl shadow-emerald-500/30 p-8 flex flex-col justify-between "
+          className="absolute inset-0 w-full h-full bg-linear-to-br from-emerald-500 to-teal-500 dark:from-[#FF3CAC] dark:to-[#784BA0] border-2 border-emerald-200/60 dark:border-[#784BA0]/60 rounded-2xl shadow-xl shadow-emerald-500/30 dark:shadow-[#7A00FF]/30 p-8 flex flex-col justify-between "
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
@@ -97,7 +97,7 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
             </p>
           </div>
            {/* flip indicator */}
-              <div className="flex items-center justify-center gap-2 text-xs text-slate-400 font-medium">
+              <div className="flex items-center justify-center gap-2 text-xs text-white/75 font-medium">
                 <RotateCcw className="w-3.5 h-3.5" strokeWidth={2}/>
                 <span>click to see question</span>
               </div>
