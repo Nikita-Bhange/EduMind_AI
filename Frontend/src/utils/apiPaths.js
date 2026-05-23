@@ -1,12 +1,12 @@
-export const BASE_URL = "http://localhost:8000";
 
+export const BASE_URL = "https://edumind-ai-agm0.onrender.com";
 export const API_PATHS = {
   AUTH: {
-    REGISTER: "/api/auth/register",
-    LOGIN: "http://localhost:8000/api/auth/login",
-    GET_PROFILE: "/api/auth/profile",
-    UPDATE_PROFILE: "/api/auth/profile",
-    CHANGE_PASSWORD: "/api/auth/change-password",
+    REGISTER: "https://edumind-ai-agm0.onrender.com/api/auth/register",
+    LOGIN: "https://edumind-ai-agm0.onrender.com/api/auth/login",
+    GET_PROFILE: "https://edumind-ai-agm0.onrender.com/api/auth/profile",
+    UPDATE_PROFILE: "https://edumind-ai-agm0.onrender.com/api/auth/profile",
+    CHANGE_PASSWORD: "https://edumind-ai-agm0.onrender.com/api/auth/change-password",
   },
 
   DOCUMENTS: {

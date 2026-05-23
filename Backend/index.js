@@ -25,8 +25,11 @@ const app = express();
 
 
  //Middleware to handle CORS
+// https://edu-mind-ai-psi.vercel.app/
+ 
 app.use(
   cors({
+    origin: "https://edu-mind-ai-psi.vercel.app",
     origin: true, // allow all origins
     methods: ["GET", "PUT", "POST", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
