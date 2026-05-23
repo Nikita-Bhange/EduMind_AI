@@ -22,15 +22,10 @@ const __dirname = path.dirname(__filename)
 const app = express();
  //connect ro mongodb
  connectDB()
-
-
- //Middleware to handle CORS
-// https://edu-mind-ai-psi.vercel.app/
  
 app.use(
   cors({
     origin: "https://edu-mind-ai-psi.vercel.app",
-    origin: true, // allow all origins
     methods: ["GET", "PUT", "POST", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -52,10 +47,6 @@ app.use('/api/ai',aiRoutes)
 app.use('/api/progress',progressRoutes)
 app.use(errorHandler);
 
- //404 handler
- app.use((req,res)=>{
-    res.status(404).json({success:false,error:'Route not found',statusCode:404})
- })
 
  //Start server
  const PORT = process.env.PORT || 8000
@@ -71,3 +62,8 @@ app.use(errorHandler);
  app.get("/", (req, res) => {
   res.send("Backend is running");
 });
+
+ //404 handler
+ app.use((req,res)=>{
+    res.status(404).json({success:false,error:'Route not found',statusCode:404})
+ })
